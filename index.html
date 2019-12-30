@@ -1049,7 +1049,12 @@
 							return false;
 						}
 					} catch(e) {
-						return false;
+						bech32rs = coinjs.bech32redeemscript(addr)
+						if (bech32rs) {
+							return {'type':'bech32', 'redeemscript': bech32rs}
+						} else {
+							return false;
+						}
 					}
 				}
 
