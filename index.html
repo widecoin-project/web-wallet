@@ -486,7 +486,7 @@
 					"api": "https://api.sugarchain.org",
 					"ticker": "SUGAR",
 					"decimals": 8,
-					"fee": 0.000001,
+					"fee": 0.00001,
 					"params": {
 						"satoshis": 100000000,
 						"decimals": 8,
@@ -2840,9 +2840,9 @@
 				$("#status-screen span").html(messages.tx["generating"])
 				if (['segwit', 'bech32'].includes(globalData.address_type)) {
 					if(globalData.address_type == 'bech32'){
-						var sw = coinjs.bech32Address(globalData.keys.pubkey).val();
+						var sw = coinjs.bech32Address(globalData.keys.pubkey);
 					} else {
-						var sw = coinjs.segwitAddress(globalData.keys.pubkey).val();
+						var sw = coinjs.segwitAddress(globalData.keys.pubkey);
 					}
 					script = sw.redeemscript
 				}
