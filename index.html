@@ -2840,9 +2840,9 @@
 				$("#status-screen span").html(messages.tx["generating"])
 				if (['segwit', 'bech32'].includes(globalData.address_type)) {
 					if(globalData.address_type == 'bech32'){
-						var sw = coinjs.bech32Address(globalData.keys.pubkey).val());
+						var sw = coinjs.bech32Address(globalData.keys.pubkey).val();
 					} else {
-						var sw = coinjs.segwitAddress(globalData.keys.pubkey).val());
+						var sw = coinjs.segwitAddress(globalData.keys.pubkey).val();
 					}
 					script = sw.redeemscript
 				}
