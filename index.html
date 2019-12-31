@@ -669,7 +669,7 @@
 			function getBackend() {
 				var backend = readCookie('backend')
 				if (backend == null) {
-					setCookie('backend', getBackend(), 60)
+					setCookie('backend', getConfig()['api'], 60)
 					backend = readCookie('backend')
 				}
 
@@ -714,6 +714,10 @@
 					if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
 				}
 				return null;
+			}
+
+			function deleteCookie(name) {
+				document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 			}
 
 			// SPA router function
