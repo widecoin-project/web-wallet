@@ -460,6 +460,9 @@
 							<label>Wallet Backend</label>
 							<div class="input-group">
 								<input class="form-control" type="text" placeholder="Wallet API backend">
+								<span class="input-group-append">
+									<button class="btn btn-outline-dark b-width" type="button">Update</button>
+								</span>
 							</div>
 						</div>
 					</div>
@@ -568,8 +571,14 @@
 			// Messages
 			var messages = {
 				'settings': {
-					'typeChanged': function (type) {
+					'typeSwitched': function (type) {
 						return 'Address type changed to <b>' + type + '</b>'
+					},
+					'backendSwitched': function (url) {
+						return 'Backend is switched to <b>' + url + '</b>'
+					},
+					'backendNotWorking': function (url) {
+						return 'Backend <b>' + url + '</b> don\'t seems to be available'
 					}
 				},
 				'error': {
@@ -623,17 +632,6 @@
 				switchPage(page)
 			}
 
-			// Get current wallet backend
-			function getBackend() {
-				var backend = readCookie('backend')
-				if (backend == null) {
-					setCookie('backend', getConfig()['api'], 60)
-					backend = readCookie('backend')
-				}
-
-				return backend
-			}
-
 			// Display networks list
 			function displayNetworks() {
 				coinjsInit()
@@ -662,6 +660,31 @@
 				if (['bech32', 'segwit', 'legacy'].includes(type)) {
 					setCookie('type', type, 60)
 				}
+			}
+
+			// Get current wallet backend
+			function getBackend() {
+				var backend = readCookie('backend')
+				if (backend == null) {
+					setCookie('backend', getBackend(), 60)
+					backend = readCookie('backend')
+				}
+
+				return backend
+			}
+
+			// Switch wallet backend
+			function switchBackend(url) {
+				Promise.resolve($.ajax({
+					'url': url + '/info',
+				})).then(function(data) {
+					console.log(data)
+					setCookie('backend', url, 60)
+					showMessage(messages.settings.backendSwitched(url))
+				}).catch(function() {
+					showMessage(messages.settings.backendNotWorking(url))
+					$('#wallet-backend input').val(getBackend())
+				})
 			}
 
 			// Set cookie
@@ -765,7 +788,7 @@
 			function transactionBroadcast(rawtx) {
 				return Promise.resolve($.ajax({
 					'method': 'POST',
-					'url': getConfig()['api'] + '/broadcast',
+					'url': getBackend() + '/broadcast',
 					'data': {
 						'raw': rawtx
 					}
@@ -775,7 +798,7 @@
 			// Estimate fee
 			function estimateFee() {
 				return Promise.resolve($.ajax({
-					'url': getConfig()['api'] + '/fee',
+					'url': getBackend() + '/fee',
 				})).then(function(data) {
 					return data
 				})
@@ -2825,10 +2848,10 @@
 				clearTimeout(walletTimer);
 				walletTimer = setTimeout(function() {
 					if($('.wallet-balance').text() != 'Loading...') {
-						walletBalance();
+						walletBalance()
 					}
-					checkBalanceLoop();
-				}, 20000);
+					checkBalanceLoop()
+				}, 20000)
 			}
 
 			// Open wallet by key
@@ -2842,14 +2865,11 @@
 				if (type == 'bech32') {
 					globalData.address = b32.address
 					$('#wallet-keys-script').removeClass('d-none')
-					// $('#address-type-btn').text('Bech32')
 				} else if (type == 'segwit') {
 					globalData.address = sw.address
 					$('#wallet-keys-script').removeClass('d-none')
-					// $('#address-type-btn').text('SegWit')
 				} else {
 					$('#wallet-keys-script').addClass('d-none')
-					// $('#address-type-btn').text('Legacy')
 				}
 
 				$('#wallet-keys-pubkey input').val(pubkey)
@@ -3012,7 +3032,7 @@
 			// All starts here
 			$(document).ready(function() {
 				$('#wallet-version').text(walletVersion)
-				$('#wallet-backend input').val(getConfig()['api'])
+				$('#wallet-backend input').val(getBackend())
 				$('#address-type-select select').val(getAddressType());
 
 				displayNetworks()
@@ -3194,10 +3214,15 @@
 				// Change address type
 				$('#address-type-select select').on('change', function() {
 					switchAddressType($(this).val())
-					showMessage(messages.settings.typeChanged($(this).val()))
+					showMessage(messages.settings.typeSwitched($(this).val()))
 					if (globalData.keys != undefined) {
 						openWallet(globalData.keys, getAddressType())
 					}
+				})
+
+				// Change wallet backend
+				$('#wallet-backend button').click(function(e) {
+					switchBackend($('#wallet-backend input').val())
 				})
 
 				// Set wallet recomended fee
