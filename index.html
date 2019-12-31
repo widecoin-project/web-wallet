@@ -524,7 +524,8 @@
 					'params': {
 						'pub': 0x3F,
 						'multisig': 0x7D,
-						'priv': 0x80
+						'priv': 0x80,
+						'hrp': 'sugar'
 					}
 				}
 			}
@@ -532,18 +533,18 @@
 			// Explorer links
 			var blockExplorer = {
 				'address': function(address) {
-					return 'https://sugar.wtf/#/address/' + address + '/' + getApi()['ticker'] 
+					return 'https://sugar.wtf/#/address/' + address + '/' + getConfig()['ticker']
 				},
 				'tx': function(tx) {
-					return 'https://sugar.wtf/#/transaction/' + tx + '/' + getApi()['ticker'] 
+					return 'https://sugar.wtf/#/transaction/' + tx + '/' + getConfig()['ticker']
 				}
 			}
 
 			var globalData = {
-				'keys': undefined,
 				'address': '',
 				'balance': 0,
-				'rfee': getApi()['fee'],
+				'keys': undefined,
+				'rfee': getConfig()['fee'],
 				'tx': {
 					'amount': 0,
 					'outputs': [],
@@ -566,6 +567,11 @@
 
 			// Messages
 			var messages = {
+				'settings': {
+					'typeChanged': function (type) {
+						return 'Address type changed to <b>' + type + '</b>'
+					}
+				},
 				'error': {
 					'not-enough-funds': 'You don\'t have enough funds for this transaction!',
 					'not-valid-address': 'You must specify valid address!',
@@ -595,7 +601,7 @@
 			}
 
 			// Get current network config
-			function getApi() {
+			function getConfig() {
 				var network = readCookie('network')
 				if (network == null || networksConfigs[network] == undefined) {
 					setCookie('network', Object.keys(networksConfigs)[0], 60)
@@ -606,20 +612,32 @@
 			}
 
 			// Switch network
-			function switchApi(network, page = '') {
+			function switchConfig(network, page = '') {
 				network = network.toUpperCase()
-				if (networksConfigs[network] != undefined & networksConfigs[network] != getApi()) {
+				if (networksConfigs[network] != undefined & networksConfigs[network] != getConfig()) {
 					setCookie('network', network, 60)
 					closeWallet()
 					displayNetworks()
 				}
+
 				switchPage(page)
+			}
+
+			// Get current wallet backend
+			function getBackend() {
+				var backend = readCookie('backend')
+				if (backend == null) {
+					setCookie('backend', getConfig()['api'], 60)
+					backend = readCookie('backend')
+				}
+
+				return backend
 			}
 
 			// Display networks list
 			function displayNetworks() {
 				coinjsInit()
-				network = getApi()
+				network = getConfig()
 				$('#network-versions').text(network['name'])
 				$('#network-list .dropdown-menu').empty()
 
@@ -714,7 +732,7 @@
 						case 'network':
 							network = urlParams[2]
 							if (network != undefined) {
-								switchApi(network)
+								switchConfig(network)
 							}
 
 							break
@@ -747,7 +765,7 @@
 			function transactionBroadcast(rawtx) {
 				return Promise.resolve($.ajax({
 					'method': 'POST',
-					'url': getApi()['api'] + '/broadcast',
+					'url': getConfig()['api'] + '/broadcast',
 					'data': {
 						'raw': rawtx
 					}
@@ -757,7 +775,7 @@
 			// Estimate fee
 			function estimateFee() {
 				return Promise.resolve($.ajax({
-					'url': getApi()['api'] + '/fee',
+					'url': getConfig()['api'] + '/fee',
 				})).then(function(data) {
 					return data
 				})
@@ -765,7 +783,7 @@
 
 			// Convert satoshis to readable amount
 			function amountFormat(amount, invert = false) {
-				var decimals = getApi()['decimals']
+				var decimals = getConfig()['decimals']
 				if (!invert) {
 					return parseFloat((amount / Math.pow(10, decimals)).toFixed(decimals))
 				} else {
@@ -800,14 +818,14 @@
 
 				var coinjs = window.coinjs = function () { };
 
-				config = getApi()
+				config = getConfig()
 				coinjs.pub = config.params.pub
 				coinjs.multisig = config.params.multisig
 				coinjs.priv = config.params.priv
 				coinjs.host = config.api
 
 				coinjs.hdkey = {'prv': 0x0488ade4, 'pub': 0x0488b21e}
-				coinjs.bech32 = {'charset':'qpzry9x8gf2tvdw0s3jn54khce6mua7l', 'version':0, 'hrp': 'sugar'}
+				coinjs.bech32 = {'charset':'qpzry9x8gf2tvdw0s3jn54khce6mua7l', 'version':0, 'hrp': config.params.hrp}
 				coinjs.compressed = true
 
 				/* start of address functions */
@@ -2785,10 +2803,10 @@
 					data = JSON.parse(data)
 					if(data.error == undefined) {
 						globalData.balance = data.result.balance
-						$('.wallet-balance').text(amountFormat(globalData.balance) + ' ' + getApi()['ticker'])
+						$('.wallet-balance').text(amountFormat(globalData.balance) + ' ' + getConfig()['ticker'])
 					} else {
 						showMessage('We couldn\'t load wallet balance')
-						$('.wallet-balance').text('0.00 ' + getApi()['ticker'])
+						$('.wallet-balance').text('0.00 ' + getConfig()['ticker'])
 					}
 				});
 			}
@@ -2842,8 +2860,8 @@
 				$('#open-block').addClass('d-none')
 				$('#wallet-block').removeClass('d-none')
 				$('#history-link').attr('href', blockExplorer.address(globalData.address))
-				$('#send-fee').attr('placeholder', 'Fee (recommended ' + globalData.rfee + ' ' + getApi()['ticker'] + ')')
-				showQrAddress(getApi()['uri'] + globalData.address)
+				$('#send-fee').attr('placeholder', 'Fee (recommended ' + globalData.rfee + ' ' + getConfig()['ticker'] + ')')
+				showQrAddress(getConfig()['uri'] + globalData.address)
 
 				// Init wallet stuffs
 				walletBalance()
@@ -2852,7 +2870,7 @@
 			}
 
 			function showConfirmation(amount) {
-				$('#confirm-amount').text(amount + ' ' + getApi()['ticker'])
+				$('#confirm-amount').text(amount + ' ' + getConfig()['ticker'])
 				$('#send-modal').modal('toggle')
 				$('#send-title').text(messages.title['sure'])
 				$('#send-cancel').removeClass('disabled')
@@ -2877,7 +2895,7 @@
 				var txFee = globalData.tx.fee
 				var script = false
 				var sequence = 0xffffffff - 2 // RBF
-				var decimals = getApi()['decimals']
+				var decimals = getConfig()['decimals']
 				var outputs = globalData.tx.outputs
 				var amount = globalData.tx.amount
 				var address = globalData.address
@@ -2994,7 +3012,7 @@
 			// All starts here
 			$(document).ready(function() {
 				$('#wallet-version').text(walletVersion)
-				$('#wallet-backend input').val(getApi()['api'])
+				$('#wallet-backend input').val(getConfig()['api'])
 				$('#address-type-select select').val(getAddressType());
 
 				displayNetworks()
@@ -3027,8 +3045,8 @@
 						showMessage(messages.error['not-valid-fee'])
 						error = true
 					} else {
-						if (txFee < getApi()['fee']) {
-							showMessage(messages.error.toSmallFee(getApi()['fee'], getApi()['ticker']))
+						if (txFee < getConfig()['fee']) {
+							showMessage(messages.error.toSmallFee(getConfig()['fee'], getConfig()['ticker']))
 							error = true
 						}
 					}
@@ -3051,7 +3069,7 @@
 					})
 
 					total += txFee * 1
-					total = parseFloat(total.toFixed(getApi()['decimals']))
+					total = parseFloat(total.toFixed(getConfig()['decimals']))
 
 					if (!error) {
 						if (total <= amountFormat(globalData.balance)) {
@@ -3176,7 +3194,7 @@
 				// Change address type
 				$('#address-type-select select').on('change', function() {
 					switchAddressType($(this).val())
-					showMessage('Address type changed to <b>' + $(this).val() + '</b>')
+					showMessage(messages.settings.typeChanged($(this).val()))
 					if (globalData.keys != undefined) {
 						openWallet(globalData.keys, getAddressType())
 					}
@@ -3187,7 +3205,7 @@
 					if (data.error == undefined) {
 						globalData.rfee = amountFormat(data.result.feerate)
 					} else {
-						globalData.rfee = getApi()['fee']
+						globalData.rfee = getConfig()['fee']
 					}
 				})
 
