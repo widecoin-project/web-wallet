@@ -160,15 +160,15 @@
 			.break-lines {
 			  /* https://stackoverflow.com/a/18706058/9217774 <3 */
 			  -ms-word-break: break-all;
-			    word-break: break-all;
+				word-break: break-all;
 
 			  /* Non standard for webkit */
-			    word-break: break-word;
+				word-break: break-word;
 
-			    -webkit-hyphens: auto;
-			       -moz-hyphens: auto;
-			        -ms-hyphens: auto;
-			            hyphens: auto;
+				-webkit-hyphens: auto;
+				   -moz-hyphens: auto;
+					-ms-hyphens: auto;
+						hyphens: auto;
 			}
 			.qr-code canvas{
 				max-width: 100%;
@@ -208,11 +208,12 @@
 						<li class="nav-item">
 							<a href="#/broadcast" class="nav-link router-link mr-md-2" data-route="broadcast">Broadcast</a>
 						</li>
+						<!-- <li class="nav-item">
+							<a href="#/settings" class="nav-link router-link mr-md-2" data-route="settings">Settings</a>
+						</li> -->
 						<li class="nav-item dropdown" id="network-list">
 							<a class="nav-item nav-link dropdown-toggle" href="#" id="network-versions" data-toggle="dropdown">NETWORK</a>
-							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="network-versions" >
-								
-							</div>
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="network-versions" ></div>
 						</li>
 					</ul>
 				</div>
@@ -297,16 +298,16 @@
 									<div id="qr-code-addres" class="qr-code"></div>
 									<div id="wallet-address"></div>
 									<h3 class="wallet-balance mb-0 pb-0 c-pointer">Loading...</h3>
-									<div class="dropright mt-1">
+									<!-- <div class="dropright mt-1">
 										<button class="btn btn-sm btn-default dropdown-toggle" type="button" id="address-type-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 											TYPE
 										</button>
 										<div class="dropdown-menu" aria-labelledby="address-type-btn">
 											<a class="dropdown-item address-type-switch" data-address-type="bech32" href="#">Bech32</a>
-											<!-- <a class="dropdown-item address-type-switch" data-address-type="segwit" href="#">SegWit</a> -->
+											<a class="dropdown-item address-type-switch" data-address-type="segwit" href="#">SegWit</a>
 											<a class="dropdown-item address-type-switch" data-address-type="legacy" href="#">Legacy</a>
 										</div>
-									</div>
+									</div> -->
 								</div>
 							</div>
 
@@ -437,6 +438,38 @@
 			</div>
 		</div>
 
+		<!-- Settings transaction -->
+		<div id="settings" class="router-page">
+			<div class="container">
+				<div class="card mb-3">
+					<div class="card-header">
+						<b>Wallet settings</b>
+					</div>
+					<div class="card-body">
+						<div id="address-type-select">
+							<label>Address Type</label>
+							<div class="input-group pb-2">
+								<select class="form-control">
+									<option>bech32</option>
+									<option>p2sh-segwit</option>
+									<option>legacy</option>
+								</select>
+							</div>
+						</div>
+						<div id="wallet-backend">
+							<label>Wallet Backend</label>
+							<div class="input-group">
+								<input class="form-control" type="text" placeholder="Wallet API backend">
+							</div>
+						</div>
+					</div>
+					<div class="card-footer">
+						Wallet version: <b id="wallet-version"></b>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div id="send-modal" class="modal" tabindex="-1" role="dialog">
 			<div class="modal-dialog modal-md" role="document">
 				<div class="modal-content">
@@ -479,55 +512,54 @@
 		<script>
 			// Config
 			var walletTimer = false
-			var walletVersion = "0.1"
+			var walletVersion = '0.1'
 			var networksConfigs = {
-				"SUGAR": {
-					"name": "Main Network (SUGAR)",
-					"api": "https://api.sugarchain.org",
-					"ticker": "SUGAR",
-					"decimals": 8,
-					"fee": 0.00001,
-					"params": {
-						"satoshis": 100000000,
-						"decimals": 8,
-						"pub": 0x3F,
-						"multisig": 0x7D,
-						"priv": 0x80
+				'SUGAR': {
+					'uri': 'sugarchain:',
+					'name': 'Main Network (SUGAR)',
+					'api': 'https://api.sugarchain.org',
+					'ticker': 'SUGAR',
+					'decimals': 8,
+					'fee': 0.00001,
+					'params': {
+						'pub': 0x3F,
+						'multisig': 0x7D,
+						'priv': 0x80
 					}
 				}
 			}
 
 			// Explorer links
 			var blockExplorer = {
-				"address": function(address) {
-					return "https://sugar.wtf/#/address/" + address + "/" + getApi()["ticker"] 
+				'address': function(address) {
+					return 'https://sugar.wtf/#/address/' + address + '/' + getApi()['ticker'] 
 				},
-				"tx": function(tx) {
-					return "https://sugar.wtf/#/transaction/" + tx + "/" + getApi()["ticker"] 
+				'tx': function(tx) {
+					return 'https://sugar.wtf/#/transaction/' + tx + '/' + getApi()['ticker'] 
 				}
 			}
 
 			var globalData = {
-				"keys": {},
-				"address": "",
-				"address_type": "bech32",
-				"balance": 0,
-				"rfee": getApi()["fee"],
-				"tx": {
-					"amount": 0,
-					"outputs": [],
-					"fee": 0
+				'keys': {},
+				'address': '',
+				'address_type': 'bech32',
+				'balance': 0,
+				'rfee': getApi()['fee'],
+				'tx': {
+					'amount': 0,
+					'outputs': [],
+					'fee': 0
 				},
-				"resetTx": function() {
+				'resetTx': function() {
 					this.tx = {
-						"amount": 0,
-						"outputs": [],
-						"fee": 0
+						'amount': 0,
+						'outputs': [],
+						'fee': 0
 					}
 				},
-				"clear": function() {
+				'clear': function() {
 					this.keys = {}
-					this.address = ""
+					this.address = ''
 					this.balance = 0
 					this.resetTx()
 				}
@@ -535,50 +567,50 @@
 
 			// Messages
 			var messages = {
-				"error": {
-					"not-enough-funds": "You don't have enough funds for this transaction!",
-					"not-valid-address": "You must specify valid address!",
-					"not-valid-amount": "You must specify valid amount!",
-					"not-valid-fee": "You must specify valid fee!",
-					"bad-priv-key": "Bad WIF private key!",
-					"not-enough-utxo": "Not enough utxo :(",
-					"broadcast-failed": "Transaction broadcast failed :(",
-					"pass-not-match": "Your passwords do not match!",
-					"pass-too-short": "Your password must be at least 10 chars long!",
-					"bad-email": "Your email address doesn't appear to be valid!",
-					"toSmallFee": function (fee, ticker) {
-						return "You should specify fee not less than " + fee + " " + ticker + "!"
+				'error': {
+					'not-enough-funds': 'You don\'t have enough funds for this transaction!',
+					'not-valid-address': 'You must specify valid address!',
+					'not-valid-amount': 'You must specify valid amount!',
+					'not-valid-fee': 'You must specify valid fee!',
+					'bad-priv-key': 'Bad WIF private key!',
+					'not-enough-utxo': 'Not enough utxo :(',
+					'broadcast-failed': 'Transaction broadcast failed :(',
+					'pass-not-match': 'Your passwords do not match!',
+					'pass-too-short': 'Your password must be at least 10 chars long!',
+					'bad-email': 'Your email address doesn\'t appear to be valid!',
+					'toSmallFee': function (fee, ticker) {
+						return 'You should specify fee not less than ' + fee + ' ' + ticker + '!'
 					}
 				},
-				"tx": {
-					"loading-utxo": "Loading UTXOs...",
-					"generating": "Generating transaction...",
-					"success": "Transaction successfully broadcasted: ",
+				'tx': {
+					'loading-utxo': 'Loading UTXOs...',
+					'generating': 'Generating transaction...',
+					'success': 'Transaction successfully broadcasted: ',
 				},
-				"title": {
-					"sure": "Are you sure?",
-					"processing": "Processing...",
-					"success": "Success",
-					"failed": "Failed"
+				'title': {
+					'sure': 'Are you sure?',
+					'processing': 'Processing...',
+					'success': 'Success',
+					'failed': 'Failed'
 				}
 			}
 
 			// Get current network config
 			function getApi() {
-				var network = readCookie("network")
+				var network = readCookie('network')
 				if (network == null || networksConfigs[network] == undefined) {
-					setCookie("network", Object.keys(networksConfigs)[0], 60)
-					network = readCookie("network")
+					setCookie('network', Object.keys(networksConfigs)[0], 60)
+					network = readCookie('network')
 				}
 
 				return networksConfigs[network]
 			}
 
 			// Switch network
-			function swithcApi(network, page = "") {
+			function swithcApi(network, page = '') {
 				network = network.toUpperCase()
 				if (networksConfigs[network] != undefined & networksConfigs[network] != getApi()) {
-					setCookie("network", network, 60)
+					setCookie('network', network, 60)
 					closeWallet()
 					displayNetworks()
 				}
@@ -589,31 +621,31 @@
 			function displayNetworks() {
 				coinjsInit()
 				network = getApi()
-				$("#network-versions").text(network["name"])
-				$("#network-list .dropdown-menu").empty()
+				$('#network-versions').text(network['name'])
+				$('#network-list .dropdown-menu').empty()
 
 				for (var key in networksConfigs) {
-					$("#network-list .dropdown-menu").append(`<a class="dropdown-item ${networksConfigs[key]["name"] == network["name"] ? "active" : ""}" href="#/network/${key}">${networksConfigs[key]["name"]}</a>`)
+					$('#network-list .dropdown-menu').append(`<a class="dropdown-item ${networksConfigs[key]['name'] == network['name'] ? 'active' : ''}" href="#/network/${key}">${networksConfigs[key]['name']}</a>`)
 				}
 			}
 
 			// Set cookie
 			function setCookie(name, value, days) {
-				var expires;
+				var expires
 
 				if (days) {
 					var date = new Date();
 					date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-					expires = "; expires=" + date.toGMTString();
+					expires = '; expires=' + date.toGMTString();
 				} else {
-					expires = "";
+					expires = '';
 				}
-				document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+				document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value) + expires + '; path=/';
 			}
 
 			// Read cookie
 			function readCookie(name) {
-				var nameEQ = encodeURIComponent(name) + "=";
+				var nameEQ = encodeURIComponent(name) + '=';
 				var ca = document.cookie.split(';');
 				for (var i = 0; i < ca.length; i++) {
 					var c = ca[i];
@@ -626,17 +658,17 @@
 			// SPA router function
 			function routePage() {
 				var urlParams = readParams()
-				if (window.location.hash == "") {
-					window.location.hash = "#/"
+				if (window.location.hash == '') {
+					window.location.hash = '#/'
 				}
 
-				if (urlParams[0] == "#") {
-					var pageName = urlParams[1] != "" ? urlParams[1] : "homepage"
-					var templateName = "#" + pageName
+				if (urlParams[0] == '#') {
+					var pageName = urlParams[1] != '' ? urlParams[1] : 'homepage'
+					var templateName = '#' + pageName
 						
-					$(".router-link").removeClass("active")
-					$(".router-link[data-route=" + pageName + "]").addClass("active")
-					if ($(".router-page:visible").attr("id") != urlParams[1]) {
+					$('.router-link').removeClass('active')
+					$('.router-link[data-route=' + pageName + ']').addClass('active')
+					if ($('.router-page:visible').attr('id') != urlParams[1]) {
 						$('div.router-page').hide()
 						if ($(templateName).length) {
 							$(templateName).show()
@@ -645,20 +677,24 @@
 
 					switch(pageName) {
 						// Home page ¯\_(ツ)_/¯
-						case "homepage":
+						case 'homepage':
 							setHomeTitle()
 							break
 
-						case "create":
-							setTitle("Create wallet")
+						case 'create':
+							setTitle('Create wallet')
 							break
 
-						case "broadcast":
-							setTitle("Broadcast transaction")
+						case 'broadcast':
+							setTitle('Broadcast transaction')
+							break
+
+						case 'settings':
+							setTitle('Wallet settings')
 							break
 
 						// Swith network
-						case "network":
+						case 'network':
 							network = urlParams[2]
 							if (network != undefined) {
 								swithcApi(network)
@@ -675,9 +711,9 @@
 			}
 
 			// Switch router page
-			function switchPage(url = "", params = []) {
-				params = params.length > 0 ? "/" + params.join("/") : ""
-				window.location.hash = "#" + "/" + url + params;
+			function switchPage(url = '', params = []) {
+				params = params.length > 0 ? '/' + params.join('/') : ''
+				window.location.hash = '#' + '/' + url + params;
 			}
 
 			// Read URL params
@@ -693,10 +729,10 @@
 			// Broadcast tx
 			function transactionBroadcast(rawtx) {
 				return Promise.resolve($.ajax({
-					"method": "POST",
-					"url": getApi()["api"] + "/broadcast",
-					"data": {
-						"raw": rawtx
+					'method': 'POST',
+					'url': getApi()['api'] + '/broadcast',
+					'data': {
+						'raw': rawtx
 					}
 				}))
 			}
@@ -704,7 +740,7 @@
 			// Estimate fee
 			function estimateFee() {
 				return Promise.resolve($.ajax({
-					url: getApi()["api"] + "/fee",
+					'url': getApi()['api'] + '/fee',
 				})).then(function(data) {
 					return data
 				})
@@ -712,7 +748,7 @@
 
 			// Convert satoshis to readable amount
 			function amountFormat(amount, invert = false) {
-				var decimals = getApi()["decimals"]
+				var decimals = getApi()['decimals']
 				if (!invert) {
 					return parseFloat((amount / Math.pow(10, decimals)).toFixed(decimals))
 				} else {
@@ -722,16 +758,16 @@
 
 			// Show big error message at the top of the page :D 
 			function showMessage(message) {
-				$("#error-message").html(message)
-				$("#error-message").removeClass("d-none")
+				$('#error-message').html(message)
+				$('#error-message').removeClass('d-none')
 				setTimeout(function() {
-					$("#error-message").addClass("d-none")
+					$('#error-message').addClass('d-none')
 				}, 3400);
 			}
 
 			function showQrAddress(text) {
-				$("#qr-code-addres").empty()
-				$("#qr-code-addres").qrcode(text)
+				$('#qr-code-addres').empty()
+				$('#qr-code-addres').qrcode(text)
 			}
 		</script>
 
@@ -2727,15 +2763,15 @@
 
 			// Check wallet balance
 			function walletBalance() {
-				$(".wallet-balance").text("Loading...")
-				coinjs.addressBalance($("#wallet-address").html(), function(data) {
+				$('.wallet-balance').text('Loading...')
+				coinjs.addressBalance($('#wallet-address').html(), function(data) {
 					data = JSON.parse(data)
 					if(data.error == undefined) {
 						globalData.balance = data.result.balance
-						$(".wallet-balance").text(amountFormat(globalData.balance) + " " + getApi()["ticker"])
+						$('.wallet-balance').text(amountFormat(globalData.balance) + ' ' + getApi()['ticker'])
 					} else {
-						showMessage("We couldn't load wallet balance")
-						$(".wallet-balance").text("0.00 " + getApi()["ticker"])
+						showMessage('We couldn\'t load wallet balance')
+						$('.wallet-balance').text('0.00 ' + getApi()['ticker'])
 					}
 				});
 			}
@@ -2743,9 +2779,9 @@
 			// Set title
 			function setHomeTitle() {
 				if (globalData.keys.address) {
-					setTitle("Address " + globalData.keys.address)
+					setTitle('Address ' + globalData.keys.address)
 				} else {
-					setTitle("Open Wallet")
+					setTitle('Open Wallet')
 				}
 			}
 
@@ -2753,7 +2789,7 @@
 			function checkBalanceLoop() {
 				clearTimeout(walletTimer);
 				walletTimer = setTimeout(function() {
-					if($(".wallet-balance").text() != "Loading...") {
+					if($('.wallet-balance').text() != 'Loading...') {
 						walletBalance();
 					}
 					checkBalanceLoop();
@@ -2771,27 +2807,27 @@
 
 				if (address_type == 'bech32') {
 					globalData.address = b32.address
-					$("#wallet-keys-script").removeClass("d-none")
-					$("#address-type-btn").text("Bech32")
+					$('#wallet-keys-script').removeClass('d-none')
+					// $('#address-type-btn').text('Bech32')
 				} else if (address_type == 'segwit') {
 					globalData.address = sw.address
-					$("#wallet-keys-script").removeClass("d-none")
-					$("#address-type-btn").text("SegWit")
+					$('#wallet-keys-script').removeClass('d-none')
+					// $('#address-type-btn').text('SegWit')
 				} else {
-					$("#wallet-keys-script").addClass("d-none")
-					$("#address-type-btn").text("Legacy")
+					$('#wallet-keys-script').addClass('d-none')
+					// $('#address-type-btn').text('Legacy')
 				}
 
-				$("#wallet-keys-pubkey input").val(pubkey)
-				$("#wallet-keys-privkey input").val(wif)
-				$("#wallet-keys-script input").val(sw.redeemscript)
+				$('#wallet-keys-pubkey input').val(pubkey)
+				$('#wallet-keys-privkey input').val(wif)
+				$('#wallet-keys-script input').val(sw.redeemscript)
 				
-				$("#wallet-address").html(globalData.address)
-				$("#open-block").addClass("d-none")
-				$("#wallet-block").removeClass("d-none")
-				$("#history-link").attr("href", "" + blockExplorer.address(globalData.address))
-				$("#send-fee").attr("placeholder", "Fee (recommended " + globalData.rfee + " " + getApi()["ticker"] +")")
-				showQrAddress("sugarchain:" + globalData.address)
+				$('#wallet-address').html(globalData.address)
+				$('#open-block').addClass('d-none')
+				$('#wallet-block').removeClass('d-none')
+				$('#history-link').attr('href', '' + blockExplorer.address(globalData.address))
+				$('#send-fee').attr('placeholder', 'Fee (recommended ' + globalData.rfee + ' ' + getApi()['ticker'] + ')')
+				showQrAddress(getApi()['uri'] + globalData.address)
 
 				// Init wallet stuffs
 				walletBalance()
@@ -2800,24 +2836,24 @@
 			}
 
 			function showConfirmation(amount) {
-				$("#confirm-amount").text(amount + " " + getApi()["ticker"])
+				$('#confirm-amount').text(amount + ' ' + getApi()['ticker'])
 				$('#send-modal').modal('toggle')
-				$('#send-title').text(messages.title["sure"])
-				$("#send-cancel").removeClass("disabled")
-				$("#send-confirm").removeClass("disabled")
-				$("#confirm-screen").removeClass("d-none")
-				$("#status-screen").addClass("d-none")
-				$("#status-screen span").html("")
+				$('#send-title').text(messages.title['sure'])
+				$('#send-cancel').removeClass('disabled')
+				$('#send-confirm').removeClass('disabled')
+				$('#confirm-screen').removeClass('d-none')
+				$('#status-screen').addClass('d-none')
+				$('#status-screen span').html('')
 
-				$.each($("#send-outputs .send-outputs-item"), function(key, item) {
+				$.each($('#send-outputs .send-outputs-item'), function(key, item) {
 					globalData.tx.outputs.push({
-						"address": $("[name='send-address']", item).val().trim(),
-						"amount": $("[name='send-ammount']", item).val() * 1
+						'address': $('[name="send-address"]', item).val().trim(),
+						'amount': $('[name="send-ammount"]', item).val() * 1
 					})
 				})
 
-				globalData.tx.fee = amountFormat(($("#send-fee").val() != "") ? $("#send-fee").val() : globalData.rfee, true)
 				globalData.tx.amount = amountFormat(amount, true)
+				globalData.tx.fee = amountFormat(($('#send-fee').val() != '') ? $('#send-fee').val() : globalData.rfee, true)
 			}
 
 			function sendTx() {
@@ -2825,19 +2861,19 @@
 				var txFee = globalData.tx.fee
 				var script = false
 				var sequence = 0xffffffff - 2 // RBF
-				var decimals = getApi()["decimals"]
+				var decimals = getApi()['decimals']
 				var outputs = globalData.tx.outputs
 				var amount = globalData.tx.amount
 				var address = globalData.address
 
-				$("#send-cancel").addClass("disabled")
-				$("#send-confirm").addClass("disabled")
-				$("#confirm-screen").addClass("d-none")
-				$("#status-screen").removeClass("d-none")
-				$("#send-title").text(messages.title["processing"])
-				$("#status-screen .extra-info").empty()
+				$('#send-cancel').addClass('disabled')
+				$('#send-confirm').addClass('disabled')
+				$('#confirm-screen').addClass('d-none')
+				$('#status-screen').removeClass('d-none')
+				$('#send-title').text(messages.title['processing'])
+				$('#status-screen .extra-info').empty()
 
-				$("#status-screen span").html(messages.tx["generating"])
+				$('#status-screen span').html(messages.tx['generating'])
 				if (['segwit', 'bech32'].includes(globalData.address_type)) {
 					if(globalData.address_type == 'bech32'){
 						var sw = coinjs.bech32Address(globalData.keys.pubkey);
@@ -2852,7 +2888,7 @@
 				}
 
 				tx.addUnspent(address, amount, function(data) {
-					$("#status-screen span").html(messages.tx["loading-utxo"])
+					$('#status-screen span').html(messages.tx['loading-utxo'])
 					var value = data.value
 					if(value >= amount) {
 						var change = value - amount
@@ -2869,14 +2905,14 @@
 
 						transactionBroadcast(signed).then(function(data) {
 							if (data.error == undefined) {
-								$("#status-screen span").html(`
+								$('#status-screen span').html(`
 									<a href="` + blockExplorer.tx(data.result) + `" target="_blank">` + data.result + `</a> 
 								`)
-								$('#send-title').text(messages.title["success"])
+								$('#send-title').text(messages.title['success'])
 							} else {
-								$("#status-screen span").html(messages.error["broadcast-failed"])
-								$('#send-title').text(messages.title["failed"])
-								$("#status-screen .extra-info").html(`
+								$('#status-screen span').html(messages.error['broadcast-failed'])
+								$('#send-title').text(messages.title['failed'])
+								$('#status-screen .extra-info').html(`
 									<div class="mt-3">
 										<textarea class="form-control" readonly cols="30" rows="10">${data.error.message}</textarea>
 									</div>
@@ -2885,7 +2921,7 @@
 							resetTxForm()
 						})
 					} else {
-						showMessage(messages.error["not-enough-funds"])
+						showMessage(messages.error['not-enough-funds'])
 					}
 
 				}, script, script, sequence);
@@ -2893,30 +2929,30 @@
 
 			// Close wallet
 			function closeWallet() {
-				$("#open-block").removeClass("d-none")
-				$("#wallet-block").addClass("d-none")
+				$('#open-block').removeClass('d-none')
+				$('#wallet-block').addClass('d-none')
 				globalData.clear()
 				setHomeTitle()
 			}
 
 			// Create new wallet
-			$("#footer-create").click(function(){
+			$('#footer-create').click(function(){
 				var coin = coinjs.newKeys(null);
-				$("#create-keys-address input").val(coin.address)
-				$("#create-keys-pubkey input").val(coin.pubkey)
-				$("#create-keys-privkey input").val(coin.wif)
+				$('#create-keys-address input').val(coin.address)
+				$('#create-keys-pubkey input').val(coin.pubkey)
+				$('#create-keys-privkey input').val(coin.wif)
 			})
 
 			// Broadcast raw transaction
-			$("#footer-broadcast").click(function(){
-				var rawtx = $("#transaction-broadcast-raw")
+			$('#footer-broadcast').click(function(){
+				var rawtx = $('#transaction-broadcast-raw')
 				transactionBroadcast(rawtx.val()).then(function(data) {
 					if (data.error == undefined) {
 						showMessage(`
-							${messages.tx["success"]}<a href="` + blockExplorer.tx(data.result) + `" target="_blank">` + data.result + `</a>
+							${messages.tx['success']}<a href="` + blockExplorer.tx(data.result) + `" target="_blank">` + data.result + `</a>
 						`)
 					} else {
-						showMessage(messages.error["broadcast-failed"])
+						showMessage(messages.error['broadcast-failed'])
 					}
 				})
 				rawtx.val("")
@@ -2924,25 +2960,28 @@
 
 			// Reset sending form
 			function resetTxForm() {
-				$(".send-additional-output").remove()
-				$("#wallet-send input").val("")
+				$('.send-additional-output').remove()
+				$('#wallet-send input').val('')
 				globalData.resetTx()
 			}
 
 			// All starts here
 			$(document).ready(function() {
+				$('#wallet-version').text(walletVersion)
+				$('#wallet-backend input').val(getApi()['api'])
+
 				displayNetworks()
 				routePage()
 
-				$(".tab-link").click(function(e) {
-					var tabFamily = $(this).data("tab-family")
-					var tabName = $(this).data("tab-name")
+				$('.tab-link').click(function(e) {
+					var tabFamily = $(this).data('tab-family')
+					var tabName = $(this).data('tab-name')
 
-					$("#" + tabFamily + " .tab-item").addClass("d-none")
-					$("#" + tabFamily + " .card-header .card-header-tabs .nav-link").removeClass("active")
+					$('#' + tabFamily + ' .tab-item').addClass('d-none')
+					$('#' + tabFamily + ' .card-header .card-header-tabs .nav-link').removeClass('active')
 				
-					$("#" + tabFamily + " [data-tab=" + tabName + "]").removeClass("d-none")
-					$(this).addClass("active")
+					$('#' + tabFamily + ' [data-tab=' + tabName + ']').removeClass('d-none')
+					$(this).addClass('active')
 					
 					e.preventDefault()
 				})
@@ -2952,33 +2991,32 @@
 					$(window).trigger('hashchange')
 				}
 
-				$("#send-tx").click(function() {
+				$('#send-tx').click(function() {
 					var error = false
-					var txFee = ($("#send-fee").val() != "") ? $("#send-fee").val() : globalData.rfee
+					var txFee = ($('#send-fee').val() != '') ? $('#send-fee').val() : globalData.rfee
 					var total = 0
 
 					if ((isNaN(txFee)) || txFee <= 0) {
-						showMessage(messages.error["not-valid-fee"])
+						showMessage(messages.error['not-valid-fee'])
 						error = true
 					} else {
-						if (txFee < getApi()["fee"]) {
-							showMessage(messages.error.toSmallFee(getApi()["fee"], getApi()["ticker"]))
+						if (txFee < getApi()['fee']) {
+							showMessage(messages.error.toSmallFee(getApi()['fee'], getApi()['ticker']))
 							error = true
 						}
 					}
 
-
-					$.each($("#send-outputs .send-outputs-item"), function(key, item) {
-						var address = $("[name='send-address']", item).val().trim()
-						var amount = $("[name='send-ammount']", item).val()
+					$.each($('#send-outputs .send-outputs-item'), function(key, item) {
+						var address = $('[name="send-address"]', item).val().trim()
+						var amount = $('[name="send-address"]', item).val()
 
 						if ((isNaN(amount)) || amount <= 0) {
-							showMessage(messages.error["not-valid-amount"])
+							showMessage(messages.error['not-valid-amount'])
 							error = true
 						}
 
 						if (coinjs.addressDecode(address) == false) {
-							showMessage(messages.error["not-valid-address"])
+							showMessage(messages.error['not-valid-address'])
 							error = true
 						}
 
@@ -2986,99 +3024,99 @@
 					})
 
 					total += txFee * 1
-					total = parseFloat(total.toFixed(getApi()["decimals"]))
+					total = parseFloat(total.toFixed(getApi()['decimals']))
 
 					if (!error) {
 						if (total <= amountFormat(globalData.balance)) {
 							showConfirmation(total)
 						} else {
-							showMessage(messages.error["not-enough-funds"])
+							showMessage(messages.error['not-enough-funds'])
 						}
 					}
 				})
 
 				// Open wallet by WIF key
-				$("#open-key-form").submit(function(e){
-					var wif = $("#passphrase").val().trim()
+				$('#open-key-form').submit(function(e){
+					var wif = $('#passphrase').val().trim()
 					var wifLength = wif.length
-					if ([51, 52].includes(wifLength) && coinjs.wif2privkey(wif).privkey != "") {
+					if ([51, 52].includes(wifLength) && coinjs.wif2privkey(wif).privkey != '') {
 						globalData.keys = coinjs.getKeys(wif)
-						$("#passphrase").val("")
+						$('#passphrase').val('')
 						openWallet(globalData.keys, 'legacy')
 					} else {
-						showMessage(messages.error["bad-priv-key"])
+						showMessage(messages.error['bad-priv-key'])
 					}
 
 					e.preventDefault()
 				})
 
 				// Open wallet using email and password
-				$("#open-regular-form").submit(function(e){
-					var email = $("#open-email").val().toLowerCase()
-					var pass = $("#open-password").val()
-					var passConfirm = $("#open-password-confirm").val()
+				$('#open-regular-form').submit(function(e){
+					var email = $('#open-email').val().toLowerCase()
+					var pass = $('#open-password').val()
+					var passConfirm = $('#open-password-confirm').val()
 					if (email.match(/[\s\w\d]+@[\s\w\d]+/g)) {
-						if (pass.length>=10){
+						if (pass.length >= 10){
 							if (pass == passConfirm) {
 								var pass = pass
 								var s = email
-								s += '|'+pass+'|'
-								s += s.length+'|!@'+((pass.length*7)+email.length)*7
+								s += '|' + pass + '|'
+								s += s.length + '|!@' + ((pass.length * 7) + email.length) * 7
 								var regchars = (pass.match(/[a-z]+/g)) ? pass.match(/[a-z]+/g).length : 1
 								var regupchars = (pass.match(/[A-Z]+/g)) ? pass.match(/[A-Z]+/g).length : 1
 								var regnums = (pass.match(/[0-9]+/g)) ? pass.match(/[0-9]+/g).length : 1
-								s += ((regnums+regchars)+regupchars)*pass.length+'3571'
-								s += (s+''+s)
+								s += ((regnums + regchars) + regupchars) * pass.length + '3571'
+								s += (s + '' + s)
 
 								for (i = 0; i <= 50; i++){
 									s = Crypto.SHA256(s);
 								}
 
-								$("#open-email").val("")
-								$("#open-password").val("")
-								$("#open-password-confirm").val("")
+								$('#open-email').val('')
+								$('#open-password').val('')
+								$('#open-password-confirm').val('')
 
 								globalData.keys = coinjs.newKeys(s)
 								openWallet(globalData.keys)
 							} else {
-								showMessage(messages.error["pass-not-match"])
+								showMessage(messages.error['pass-not-match'])
 							}
 						} else {
-							showMessage(messages.error["pass-too-short"])
+							showMessage(messages.error['pass-too-short'])
 						}
 					} else {
-						showMessage(messages.error["bad-email"])
+						showMessage(messages.error['bad-email'])
 					}
 
 					e.preventDefault()
 				})
 
 				// Check wallet balance on balance label click
-				$(".wallet-balance").click(function(e){
+				$('.wallet-balance').click(function(e){
 					walletBalance()
 					e.preventDefault()
 				})
 
 				// Confirm transaction sendign (are you sure?)
-				$("#send-confirm").click(function(e){
+				$('#send-confirm').click(function(e){
 					sendTx()
 					e.preventDefault()
 				})
 
 				// Toggle private key visibility
-				$(".toggle-priv-key").click(function(){
-					if ($(this).text() == "Show") {
-						$(this).parent().parent().find(".keys-privkey").attr("type", "text")
-						$(this).text("Hide")
+				$('.toggle-priv-key').click(function(){
+					if ($(this).text() == 'Show') {
+						$(this).parent().parent().find('.keys-privkey').attr('type', 'text')
+						$(this).text('Hide')
 					} else {
-						$(this).parent().parent().find(".keys-privkey").attr("type", "password")
-						$(this).text("Show")
+						$(this).parent().parent().find('.keys-privkey').attr('type', 'password')
+						$(this).text('Show')
 					}
 				})
 
 				// Add transaction output
-				$("#add-output").click(function(e){
-					$("#send-outputs").append(`
+				$('#add-output').click(function(e){
+					$('#send-outputs').append(`
 						<div class="send-additional-output send-outputs-item input-group mb-2">
 							<input name="send-address" class="form-control" placeholder="Enter address" type="text">
 							<input name="send-ammount" class="form-control" placeholder="Amount" type="text">
@@ -3089,28 +3127,28 @@
 							</div>
 						</div>
 					`)
-					$(".remove-additional-output").click(function(e){
-						$(this).closest(".send-additional-output").remove()
+					$('.remove-additional-output').click(function(e){
+						$(this).closest('.send-additional-output').remove()
 						e.preventDefault()
 					})
 					e.preventDefault()
 				})
 
 				// Reset send form
-				$("#send-reset").click(function(e) {
+				$('#send-reset').click(function(e) {
 					resetTxForm()
 					e.preventDefault()
 				})
 
 				// Footer button which close wallet
-				$("#footer-close").click(function(e) {
+				$('#footer-close').click(function(e) {
 					closeWallet()
 					e.preventDefault()
 				})
 
 				// Change address type (legacy/segwit)
-				$(".address-type-switch").click(function(e) {
-					openWallet(globalData.keys, $(this).data("address-type"))
+				$('.address-type-switch').click(function(e) {
+					openWallet(globalData.keys, $(this).data('address-type'))
 					e.preventDefault()
 				})
 
@@ -3119,7 +3157,7 @@
 					if (data.error == undefined) {
 						globalData.rfee = amountFormat(data.result.feerate)
 					} else {
-						globalData.rfee = getApi()["fee"]
+						globalData.rfee = getApi()['fee']
 					}
 				})
 
@@ -3144,12 +3182,12 @@
 					var yEnt = Crypto.util.bytesToHex([tempY]).slice(-2);
 					var addEnt = xEnt.concat(yEnt);
 
-					if ($("#entropybucket").html().indexOf(xEnt) == -1 && $("#entropybucket").html().indexOf(yEnt) == -1) {
-						$("#entropybucket").html(addEnt + $("#entropybucket").html());
+					if ($('#entropybucket').html().indexOf(xEnt) == -1 && $('#entropybucket').html().indexOf(yEnt) == -1) {
+						$('#entropybucket').html(addEnt + $('#entropybucket').html());
 					};
 
-					if ($("#entropybucket").html().length > 128) {
-						$("#entropybucket").html($("#entropybucket").html().slice(0, 128))
+					if ($('#entropybucket').html().length > 128) {
+						$('#entropybucket').html($('#entropybucket').html().slice(0, 128))
 					};
 
 					return true;
