@@ -208,9 +208,9 @@
 						<li class="nav-item">
 							<a href="#/broadcast" class="nav-link router-link mr-md-2" data-route="broadcast">Broadcast</a>
 						</li>
-						<!-- <li class="nav-item">
+						<li class="nav-item">
 							<a href="#/settings" class="nav-link router-link mr-md-2" data-route="settings">Settings</a>
-						</li> -->
+						</li>
 						<li class="nav-item dropdown" id="network-list">
 							<a class="nav-item nav-link dropdown-toggle" href="#" id="network-versions" data-toggle="dropdown">NETWORK</a>
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="network-versions" ></div>
@@ -451,7 +451,7 @@
 							<div class="input-group pb-2">
 								<select class="form-control">
 									<option>bech32</option>
-									<option>p2sh-segwit</option>
+									<option>segwit</option>
 									<option>legacy</option>
 								</select>
 							</div>
@@ -464,7 +464,7 @@
 						</div>
 					</div>
 					<div class="card-footer">
-						Wallet version: <b id="wallet-version"></b>
+						Version: <b id="wallet-version"></b>
 					</div>
 				</div>
 			</div>
@@ -540,9 +540,8 @@
 			}
 
 			var globalData = {
-				'keys': {},
+				'keys': undefined,
 				'address': '',
-				'address_type': 'bech32',
 				'balance': 0,
 				'rfee': getApi()['fee'],
 				'tx': {
@@ -607,7 +606,7 @@
 			}
 
 			// Switch network
-			function swithcApi(network, page = '') {
+			function switchApi(network, page = '') {
 				network = network.toUpperCase()
 				if (networksConfigs[network] != undefined & networksConfigs[network] != getApi()) {
 					setCookie('network', network, 60)
@@ -626,6 +625,24 @@
 
 				for (var key in networksConfigs) {
 					$('#network-list .dropdown-menu').append(`<a class="dropdown-item ${networksConfigs[key]['name'] == network['name'] ? 'active' : ''}" href="#/network/${key}">${networksConfigs[key]['name']}</a>`)
+				}
+			}
+
+			// Get current address type
+			function getAddressType() {
+				var type = readCookie('type')
+				if (type == null || !['bech32', 'segwit', 'legacy'].includes(type)) {
+					setCookie('type', 'bech32', 60)
+					type = readCookie('type')
+				}
+
+				return type
+			}
+
+			// Switch address type
+			function switchAddressType(type) {
+				if (['bech32', 'segwit', 'legacy'].includes(type)) {
+					setCookie('type', type, 60)
 				}
 			}
 
@@ -697,7 +714,7 @@
 						case 'network':
 							network = urlParams[2]
 							if (network != undefined) {
-								swithcApi(network)
+								switchApi(network)
 							}
 
 							break
@@ -2778,7 +2795,7 @@
 
 			// Set title
 			function setHomeTitle() {
-				if (globalData.keys.address) {
+				if (globalData.keys != undefined) {
 					setTitle('Address ' + globalData.keys.address)
 				} else {
 					setTitle('Open Wallet')
@@ -2797,19 +2814,18 @@
 			}
 
 			// Open wallet by key
-			function openWallet(keys, address_type = 'bech32') {
+			function openWallet(keys, type = 'bech32') {
 				globalData.address = keys.address
 				var wif = keys.wif
 				var pubkey = keys.pubkey
 				var sw = coinjs.segwitAddress(pubkey)
 				var b32 = coinjs.bech32Address(pubkey)
-				globalData.address_type = address_type
 
-				if (address_type == 'bech32') {
+				if (type == 'bech32') {
 					globalData.address = b32.address
 					$('#wallet-keys-script').removeClass('d-none')
 					// $('#address-type-btn').text('Bech32')
-				} else if (address_type == 'segwit') {
+				} else if (type == 'segwit') {
 					globalData.address = sw.address
 					$('#wallet-keys-script').removeClass('d-none')
 					// $('#address-type-btn').text('SegWit')
@@ -2825,7 +2841,7 @@
 				$('#wallet-address').html(globalData.address)
 				$('#open-block').addClass('d-none')
 				$('#wallet-block').removeClass('d-none')
-				$('#history-link').attr('href', '' + blockExplorer.address(globalData.address))
+				$('#history-link').attr('href', blockExplorer.address(globalData.address))
 				$('#send-fee').attr('placeholder', 'Fee (recommended ' + globalData.rfee + ' ' + getApi()['ticker'] + ')')
 				showQrAddress(getApi()['uri'] + globalData.address)
 
@@ -2874,8 +2890,8 @@
 				$('#status-screen .extra-info').empty()
 
 				$('#status-screen span').html(messages.tx['generating'])
-				if (['segwit', 'bech32'].includes(globalData.address_type)) {
-					if(globalData.address_type == 'bech32'){
+				if (['segwit', 'bech32'].includes(getAddressType())) {
+					if (getAddressType() == 'bech32') {
 						var sw = coinjs.bech32Address(globalData.keys.pubkey);
 					} else {
 						var sw = coinjs.segwitAddress(globalData.keys.pubkey);
@@ -2937,10 +2953,20 @@
 
 			// Create new wallet
 			$('#footer-create').click(function(){
-				var coin = coinjs.newKeys(null);
-				$('#create-keys-address input').val(coin.address)
-				$('#create-keys-pubkey input').val(coin.pubkey)
-				$('#create-keys-privkey input').val(coin.wif)
+				var keys = coinjs.newKeys(null)
+				var address = keys.address
+
+				if (getAddressType() == 'bech32') {
+					var b32 = coinjs.bech32Address(keys.pubkey)
+					address = b32.address
+				} else if (getAddressType() == 'segwit') {
+					var sw = coinjs.segwitAddress(keys.pubkey)
+					address = sw.address
+				}
+
+				$('#create-keys-address input').val(address)
+				$('#create-keys-pubkey input').val(keys.pubkey)
+				$('#create-keys-privkey input').val(keys.wif)
 			})
 
 			// Broadcast raw transaction
@@ -2955,7 +2981,7 @@
 						showMessage(messages.error['broadcast-failed'])
 					}
 				})
-				rawtx.val("")
+				rawtx.val('')
 			})
 
 			// Reset sending form
@@ -2969,6 +2995,7 @@
 			$(document).ready(function() {
 				$('#wallet-version').text(walletVersion)
 				$('#wallet-backend input').val(getApi()['api'])
+				$('#address-type-select select').val(getAddressType());
 
 				displayNetworks()
 				routePage()
@@ -3042,7 +3069,7 @@
 					if ([51, 52].includes(wifLength) && coinjs.wif2privkey(wif).privkey != '') {
 						globalData.keys = coinjs.getKeys(wif)
 						$('#passphrase').val('')
-						openWallet(globalData.keys, 'legacy')
+						openWallet(globalData.keys, getAddressType())
 					} else {
 						showMessage(messages.error['bad-priv-key'])
 					}
@@ -3146,10 +3173,13 @@
 					e.preventDefault()
 				})
 
-				// Change address type (legacy/segwit)
-				$('.address-type-switch').click(function(e) {
-					openWallet(globalData.keys, $(this).data('address-type'))
-					e.preventDefault()
+				// Change address type
+				$('#address-type-select select').on('change', function() {
+					switchAddressType($(this).val())
+					showMessage('Address type changed to <b>' + $(this).val() + '</b>')
+					if (globalData.keys != undefined) {
+						openWallet(globalData.keys, getAddressType())
+					}
 				})
 
 				// Set wallet recomended fee
