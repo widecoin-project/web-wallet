@@ -173,6 +173,15 @@
 			.qr-code canvas{
 				max-width: 100%;
 			}
+			.wallet-balance {
+				font-size: 23px;
+			}
+			.wallet-balance .mono-amount {
+				font-size: 20px;
+			}
+			.mono-amount {
+				font-family: monospace;
+			}
 			[class*="entypo"]:before {
 				font-family: 'EntypoRegular', sans-serif;
 				font-size: 16px;
@@ -297,17 +306,10 @@
 								<div class="tab-item" data-tab="wallet-balance">
 									<div id="qr-code-addres" class="qr-code"></div>
 									<div id="wallet-address"></div>
-									<h3 class="wallet-balance mb-0 pb-0 c-pointer">Loading...</h3>
-									<!-- <div class="dropright mt-1">
-										<button class="btn btn-sm btn-default dropdown-toggle" type="button" id="address-type-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-											TYPE
-										</button>
-										<div class="dropdown-menu" aria-labelledby="address-type-btn">
-											<a class="dropdown-item address-type-switch" data-address-type="bech32" href="#">Bech32</a>
-											<a class="dropdown-item address-type-switch" data-address-type="segwit" href="#">SegWit</a>
-											<a class="dropdown-item address-type-switch" data-address-type="legacy" href="#">Legacy</a>
-										</div>
-									</div> -->
+									<div class="wallet-balance mb-0 pb-0 c-pointer">
+										<span class="mono-amount amount"></span>
+										<span class="ticker"></span>
+									</div>
 								</div>
 							</div>
 
@@ -582,6 +584,7 @@
 					}
 				},
 				'error': {
+					'balance-load-failed': 'We couldn\'t load wallet balance',
 					'not-enough-funds': 'You don\'t have enough funds for this transaction!',
 					'not-valid-address': 'You must specify valid address!',
 					'not-valid-amount': 'You must specify valid amount!',
@@ -2821,16 +2824,20 @@
 
 			// Check wallet balance
 			function walletBalance() {
-				$('.wallet-balance').text('Loading...')
+				var balance = '0.00'
+				$('.wallet-balance .amount').text('')
+				$('.wallet-balance .ticker').text('Loading...')
 				coinjs.addressBalance($('#wallet-address').html(), function(data) {
 					data = JSON.parse(data)
 					if(data.error == undefined) {
 						globalData.balance = data.result.balance
-						$('.wallet-balance').text(amountFormat(globalData.balance) + ' ' + getConfig()['ticker'])
+						balance = amountFormat(globalData.balance)
 					} else {
-						showMessage('We couldn\'t load wallet balance')
-						$('.wallet-balance').text('0.00 ' + getConfig()['ticker'])
+						showMessage(messages.errors['balance-load-failed'])
 					}
+
+					$('.wallet-balance .amount').text(balance)
+					$('.wallet-balance .ticker').text(getConfig()['ticker'])
 				});
 			}
 
@@ -2847,7 +2854,7 @@
 			function checkBalanceLoop() {
 				clearTimeout(walletTimer);
 				walletTimer = setTimeout(function() {
-					if($('.wallet-balance').text() != 'Loading...') {
+					if ($('.wallet-balance .ticker').text() != 'Loading...') {
 						walletBalance()
 					}
 					checkBalanceLoop()
