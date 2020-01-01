@@ -13,6 +13,7 @@
 		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
 		
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
@@ -4287,11 +4288,12 @@
 			</div>
 		</footer>
 
+		<!-- All magic is here :D -->
 		<script>
 			// Config
 			var walletTimer = false
 			var walletVersion = '0.2'
-			var networksConfigs = {
+			var networkConfigs = {
 				'SUGAR': {
 					'uri': 'sugarchain:',
 					'name': 'Main Network (SUGAR)',
@@ -4306,10 +4308,15 @@
 						'hrp': 'sugar'
 					},
 					'network': {
+						'messagePrefix': '\x19Sugarchain Signed Message:\n',
+						'bip32': {
+							'public': 0x0488b21e,
+							'private': 0x0488ade4
+						},
+						'bech32': 'sugar',
 						'pubKeyHash': 0x3F,
 						'scriptHash': 0x7D,
-						'wif': 0x80,
-						'bech32': 'sugar'
+						'wif': 0x80
 					}
 				}
 			}
@@ -4394,18 +4401,18 @@
 			// Get current network config
 			function getConfig() {
 				var network = readCookie('network')
-				if (network == null || networksConfigs[network] == undefined) {
-					setCookie('network', Object.keys(networksConfigs)[0], 60)
+				if (network == null || networkConfigs[network] == undefined) {
+					setCookie('network', Object.keys(networkConfigs)[0], 60)
 					network = readCookie('network')
 				}
 
-				return networksConfigs[network]
+				return networkConfigs[network]
 			}
 
 			// Switch network
 			function switchConfig(network, page = '') {
 				network = network.toUpperCase()
-				if (networksConfigs[network] != undefined & networksConfigs[network] != getConfig()) {
+				if (networkConfigs[network] != undefined & networkConfigs[network] != getConfig()) {
 					setCookie('network', network, 60)
 					closeWallet()
 					displayNetworks()
@@ -4420,8 +4427,8 @@
 				$('#network-versions').text(network['name'])
 				$('#network-list .dropdown-menu').empty()
 
-				for (var key in networksConfigs) {
-					$('#network-list .dropdown-menu').append(`<a class="dropdown-item ${networksConfigs[key]['name'] == network['name'] ? 'active' : ''}" href="#/network/${key}">${networksConfigs[key]['name']}</a>`)
+				for (var key in networkConfigs) {
+					$('#network-list .dropdown-menu').append(`<a class="dropdown-item ${networkConfigs[key]['name'] == network['name'] ? 'active' : ''}" href="#/network/${key}">${networkConfigs[key]['name']}</a>`)
 				}
 			}
 
@@ -4589,6 +4596,15 @@
 				})
 			}
 
+			// Get address balance
+			function addressBalance(address) {
+				return Promise.resolve($.ajax({
+					'url': getBackend() + '/balance/' + address,
+				})).then(function(data) {
+					return data
+				})
+			}
+
 			// Convert satoshis to readable amount
 			function amountFormat(amount, invert = false) {
 				var decimals = getConfig()['decimals']
@@ -4612,10 +4628,7 @@
 				$('#qr-code-addres').empty()
 				$('#qr-code-addres').qrcode(text)
 			}
-		</script>
 
-		<!-- All magic is here :D -->
-		<script>
 			/* Wallet functions */
 
 			// Check wallet balance
@@ -4623,9 +4636,9 @@
 				var balance = '0.00'
 				$('.wallet-balance .amount').text('')
 				$('.wallet-balance .ticker').text('Loading...')
-				coinjs.addressBalance($('#wallet-address').html(), function(data) {
-					data = JSON.parse(data)
-					if(data.error == undefined) {
+
+				addressBalance(globalData.address).then(function(data) {
+					if (data['error'] == undefined) {
 						globalData.balance = data.result.balance
 						balance = amountFormat(globalData.balance)
 					} else {
@@ -4634,7 +4647,7 @@
 
 					$('.wallet-balance .amount').text(balance)
 					$('.wallet-balance .ticker').text(getConfig()['ticker'])
-				});
+				})
 			}
 
 			// Set title
@@ -4658,26 +4671,14 @@
 			}
 
 			// Open wallet by key
-			function openWallet(keys, type = 'bech32') {
-				globalData.address = keys.address
-				var wif = keys.wif
-				var pubkey = keys.pubkey
-				var sw = coinjs.segwitAddress(pubkey)
-				var b32 = coinjs.bech32Address(pubkey)
-
-				if (type == 'bech32') {
-					globalData.address = b32.address
-					$('#wallet-keys-script').removeClass('d-none')
-				} else if (type == 'segwit') {
-					globalData.address = sw.address
-					$('#wallet-keys-script').removeClass('d-none')
-				} else {
-					$('#wallet-keys-script').addClass('d-none')
-				}
+			function openWallet(keys) {
+				globalData.address = getAddress(keys)
+				var pubkey = keys.publicKey.toString('hex')
+				var wif = keys.toWIF()
 
 				$('#wallet-keys-pubkey input').val(pubkey)
 				$('#wallet-keys-privkey input').val(wif)
-				$('#wallet-keys-script input').val(sw.redeemscript)
+				$('#wallet-keys-script input').val(getRedeemScript(keys.publicKey))
 				
 				$('#wallet-address').html(globalData.address)
 				$('#open-block').addClass('d-none')
@@ -4792,9 +4793,14 @@
 				setHomeTitle()
 			}
 
-			// Create new wallet
-			$('#footer-create').click(function(){
-				var keys = bitcoin.ECPair.makeRandom()
+			function getRedeemScript(pubkey) {
+				return bitcoin.payments.p2wpkh({
+					'pubkey': pubkey,
+					'network': getConfig()['network']
+				})
+			}
+
+			function getAddress(keys) {
 				var network = getConfig()['network']
 				var address = undefined
 
@@ -4805,10 +4811,7 @@
 					}).address
 				} else if (getAddressType() == 'segwit') {
 					address = bitcoin.payments.p2sh({
-						'redeem': bitcoin.payments.p2wpkh({
-							'pubkey': keys.publicKey,
-							'network': network
-						}),
+						'redeem': getRedeemScript(keys.publicKey),
 						'network': network
 					}).address
 				} else if (getAddressType() == 'legacy') {
@@ -4817,6 +4820,14 @@
 						'network': getConfig()['network']
 					}).address
 				}
+
+				return address
+			}
+
+			// Create new wallet
+			$('#footer-create').click(function() {
+				var keys = bitcoin.ECPair.makeRandom({'network': getConfig()['network']})
+				var address = getAddress(keys)
 
 				if (address != undefined) {
 					$('#create-keys-address input').val(address)
@@ -4925,7 +4936,7 @@
 					if ([51, 52].includes(wifLength) && coinjs.wif2privkey(wif).privkey != '') {
 						globalData.keys = coinjs.getKeys(wif)
 						$('#passphrase').val('')
-						openWallet(globalData.keys, getAddressType())
+						openWallet(globalData.keys)
 					} else {
 						showMessage(messages.error['bad-priv-key'])
 					}
@@ -4934,10 +4945,10 @@
 				})
 
 				// Open wallet using email and password
-				$('#open-regular-form').submit(function(e){
-					var email = $('#open-email').val().toLowerCase()
-					var pass = $('#open-password').val()
-					var passConfirm = $('#open-password-confirm').val()
+				$("#open-regular-form").submit(function(e) {
+					var email = $("#open-email").val().toLowerCase()
+					var pass = $("#open-password").val()
+					var passConfirm = $("#open-password-confirm").val()
 					if (email.match(/[\s\w\d]+@[\s\w\d]+/g)) {
 						if (pass.length >= 10){
 							if (pass == passConfirm) {
@@ -4951,15 +4962,15 @@
 								s += ((regnums + regchars) + regupchars) * pass.length + '3571'
 								s += (s + '' + s)
 
-								for (i = 0; i <= 50; i++){
-									s = Crypto.SHA256(s);
+								for (i = 0; i <= 51; i++){
+									s = sha256.update(s).hex()
 								}
 
 								$('#open-email').val('')
 								$('#open-password').val('')
 								$('#open-password-confirm').val('')
 
-								globalData.keys = coinjs.newKeys(s)
+								globalData.keys = bitcoin.ECPair.fromPrivateKey(bitcoin.Buffer.from(s, 'hex'))
 								openWallet(globalData.keys)
 							} else {
 								showMessage(messages.error['pass-not-match'])
@@ -5034,7 +5045,7 @@
 					switchAddressType($(this).val())
 					showMessage(messages.settings.typeSwitched($(this).val()))
 					if (globalData.keys != undefined) {
-						openWallet(globalData.keys, getAddressType())
+						openWallet(globalData.keys)
 					}
 				})
 
