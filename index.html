@@ -4675,10 +4675,11 @@
 				globalData.address = getAddress(keys)
 				var pubkey = keys.publicKey.toString('hex')
 				var wif = keys.toWIF()
+				var redeem = '0014' + getRedeemScript(keys.publicKey).hash.toString('hex')
 
 				$('#wallet-keys-pubkey input').val(pubkey)
 				$('#wallet-keys-privkey input').val(wif)
-				$('#wallet-keys-script input').val(getRedeemScript(keys.publicKey))
+				$('#wallet-keys-script input').val(redeem)
 				
 				$('#wallet-address').html(globalData.address)
 				$('#open-block').addClass('d-none')
@@ -4933,10 +4934,18 @@
 				$('#open-key-form').submit(function(e){
 					var wif = $('#passphrase').val().trim()
 					var wifLength = wif.length
-					if ([51, 52].includes(wifLength) && coinjs.wif2privkey(wif).privkey != '') {
-						globalData.keys = coinjs.getKeys(wif)
-						$('#passphrase').val('')
-						openWallet(globalData.keys)
+					if ([51, 52].includes(wifLength)) {
+						try {
+							globalData.keys = bitcoin.ECPair.fromWIF(wif)
+						} catch(e) {
+							showMessage(messages.error['bad-priv-key'])
+						}
+
+						if (globalData.keys != undefined) {
+							// Open only if key is valid
+							$('#passphrase').val('')
+							openWallet(globalData.keys)
+						}
 					} else {
 						showMessage(messages.error['bad-priv-key'])
 					}
