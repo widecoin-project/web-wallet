@@ -454,12 +454,12 @@
 			exports.fromBase58Check=fromBase58Check;function fromBech32(address){const result=bech32.decode(address);const data=bech32.fromWords(result.words.slice(1));return{version:result.words[0],prefix:result.prefix,data:Buffer.from(data),}}
 			exports.fromBech32=fromBech32;function toBase58Check(hash,version){typeforce(types.tuple(types.Hash160bit,types.UInt8),arguments);const payload=Buffer.allocUnsafe(21);payload.writeUInt8(version,0);hash.copy(payload,1);return bs58check.encode(payload)}
 			exports.toBase58Check=toBase58Check;function toBech32(data,version,prefix){const words=bech32.toWords(data);words.unshift(version);return bech32.encode(prefix,words)}
-			exports.toBech32=toBech32;function fromOutputScript(output,network){network=networks.bitcoin;try{return payments.p2pkh({output,network}).address}catch(e){}
+			exports.toBech32=toBech32;function fromOutputScript(output,network){network=network||networks.bitcoin;try{return payments.p2pkh({output,network}).address}catch(e){}
 			try{return payments.p2sh({output,network}).address}catch(e){}
 			try{return payments.p2wpkh({output,network}).address}catch(e){}
 			try{return payments.p2wsh({output,network}).address}catch(e){}
 			throw new Error(bscript.toASM(output)+' has no matching Address')}
-			exports.fromOutputScript=fromOutputScript;function toOutputScript(address,network){network=networks.bitcoin;let decodeBase58;let decodeBech32;try{decodeBase58=fromBase58Check(address)}catch(e){}
+			exports.fromOutputScript=fromOutputScript;function toOutputScript(address,network){network=network||networks.bitcoin;let decodeBase58;let decodeBech32;try{decodeBase58=fromBase58Check(address)}catch(e){}
 			if(decodeBase58){if(decodeBase58.version===network.pubKeyHash)
 			return payments.p2pkh({hash:decodeBase58.hash}).output;if(decodeBase58.version===network.scriptHash)
 			return payments.p2sh({hash:decodeBase58.hash}).output}else{try{decodeBech32=fromBech32(address)}catch(e){}
@@ -905,7 +905,7 @@
 			Transaction.DEFAULT_SEQUENCE=0xffffffff;Transaction.SIGHASH_ALL=0x01;Transaction.SIGHASH_NONE=0x02;Transaction.SIGHASH_SINGLE=0x03;Transaction.SIGHASH_ANYONECANPAY=0x80;Transaction.ADVANCED_TRANSACTION_MARKER=0x00;Transaction.ADVANCED_TRANSACTION_FLAG=0x01;exports.Transaction=Transaction}).call(this,require("buffer").Buffer)},{"./bufferutils":34,"./crypto":36,"./script":49,"./types":75,"buffer":143,"typeforce":137,"varuint-bitcoin":139}],74:[function(require,module,exports){(function(Buffer){'use strict';Object.defineProperty(exports,'__esModule',{value:!0});const baddress=require('./address');const bufferutils_1=require('./bufferutils');const classify=require('./classify');const bcrypto=require('./crypto');const ECPair=require('./ecpair');const networks=require('./networks');const payments=require('./payments');const bscript=require('./script');const script_1=require('./script');const transaction_1=require('./transaction');const types=require('./types');const typeforce=require('typeforce');const SCRIPT_TYPES=classify.types;const PREVOUT_TYPES=new Set(['p2pkh','p2pk','p2wpkh','p2ms','p2sh-p2pkh','p2sh-p2pk','p2sh-p2wpkh','p2sh-p2ms','p2wsh-p2pkh','p2wsh-p2pk','p2wsh-p2ms','p2sh-p2wsh-p2pkh','p2sh-p2wsh-p2pk','p2sh-p2wsh-p2ms',]);function tfMessage(type,value,message){try{typeforce(type,value)}catch(err){throw new Error(message)}}
 			function txIsString(tx){return typeof tx==='string'||tx instanceof String}
 			function txIsTransaction(tx){return tx instanceof transaction_1.Transaction}
-			class TransactionBuilder{constructor(network=networks.bitcoin,maximumFeeRate=2500){this.network=network;this.maximumFeeRate=maximumFeeRate;this.__PREV_TX_SET={};this.__INPUTS=[];this.__TX=new transaction_1.Transaction();this.__TX.version=2;this.__USE_LOW_R=!1;console.warn('Deprecation Warning: TransactionBuilder will be removed in the future. '+'(v6.x.x or later) Please use the Psbt class instead. Examples of usage '+'are available in the transactions-psbt.js integration test file on our '+'Github. A high level explanation is available in the psbt.ts and psbt.js '+'files as well.',)}
+			class TransactionBuilder{constructor(network=networks.bitcoin,maximumFeeRate=2500){this.network=network;this.maximumFeeRate=maximumFeeRate;this.__PREV_TX_SET={};this.__INPUTS=[];this.__TX=new transaction_1.Transaction();this.__TX.version=2;this.__USE_LOW_R=!1;}
 			static fromTransaction(transaction,network){const txb=new TransactionBuilder(network);txb.setVersion(transaction.version);txb.setLockTime(transaction.locktime);transaction.outs.forEach(txOut=>{txb.addOutput(txOut.script,txOut.value)});transaction.ins.forEach(txIn=>{txb.__addInputUnsafe(txIn.hash,txIn.index,{sequence:txIn.sequence,script:txIn.script,witness:txIn.witness,})});txb.__INPUTS.forEach((input,i)=>{fixMultisigOrder(input,transaction,i)});return txb}
 			setLowR(setting){typeforce(typeforce.maybe(typeforce.Boolean),setting);if(setting===undefined){setting=!0}
 			this.__USE_LOW_R=setting;return setting}
@@ -4301,12 +4301,6 @@
 					'ticker': 'SUGAR',
 					'decimals': 8,
 					'fee': 0.00001,
-					'params': {
-						'pub': 0x3F,
-						'multisig': 0x7D,
-						'priv': 0x80,
-						'hrp': 'sugar'
-					},
 					'network': {
 						'messagePrefix': '\x19Sugarchain Signed Message:\n',
 						'bip32': {
@@ -4605,6 +4599,24 @@
 				})
 			}
 
+			// Get address UTXO
+			function getUnspent(address, amount) {
+				return Promise.resolve($.ajax({
+					'url': getBackend() + '/unspent/' + address + '?amount=' + amount + '&psbt=true',
+				})).then(function(data) {
+					return data
+				})
+			}
+
+			// Get transaction info
+			function transactionInfo(hash) {
+				return Promise.resolve($.ajax({
+					'url': getBackend() + '/transaction/' + hash,
+				})).then(function(data) {
+					return data
+				})
+			}
+
 			// Convert satoshis to readable amount
 			function amountFormat(amount, invert = false) {
 				var decimals = getConfig()['decimals']
@@ -4705,9 +4717,11 @@
 				$('#status-screen span').html('')
 
 				$.each($('#send-outputs .send-outputs-item'), function(key, item) {
+					var address = $('[name="send-address"]', item).val().trim()
+					var value = $('[name="send-ammount"]', item).val() * 1
 					globalData.tx.outputs.push({
-						'address': $('[name="send-address"]', item).val().trim(),
-						'amount': $('[name="send-ammount"]', item).val() * 1
+						'address': address,
+						'amount': amountFormat(value, true)
 					})
 				})
 
@@ -4716,14 +4730,18 @@
 			}
 
 			function sendTx() {
-				var tx = coinjs.transaction()
-				var txFee = globalData.tx.fee
-				var script = false
-				var sequence = 0xffffffff - 2 // RBF
+				var network = getConfig()['network']
+				var tx_psbt = new bitcoin.Psbt({'network': network})
+				var keys = globalData.keys
+
 				var decimals = getConfig()['decimals']
 				var outputs = globalData.tx.outputs
 				var amount = globalData.tx.amount
 				var address = globalData.address
+
+				var hashType = bitcoin.Transaction.SIGHASH_ALL
+				var scripts = []
+				var amounts = []
 
 				$('#send-cancel').addClass('disabled')
 				$('#send-confirm').addClass('disabled')
@@ -4731,59 +4749,52 @@
 				$('#status-screen').removeClass('d-none')
 				$('#send-title').text(messages.title['processing'])
 				$('#status-screen .extra-info').empty()
-
 				$('#status-screen span').html(messages.tx['generating'])
-				if (['segwit', 'bech32'].includes(getAddressType())) {
-					if (getAddressType() == 'bech32') {
-						var sw = coinjs.bech32Address(globalData.keys.pubkey);
-					} else {
-						var sw = coinjs.segwitAddress(globalData.keys.pubkey);
-					}
-					script = sw.redeemscript
-				}
 
 				for (var i = 0, size = outputs.length; i < size; i++) {
-					tx.addoutput(outputs[i].address, outputs[i].amount)
+					tx_psbt.addOutput({
+						'address': outputs[i].address,
+						'value': outputs[i].amount
+					})
 				}
 
-				tx.addUnspent(address, amount, function(data) {
-					$('#status-screen span').html(messages.tx['loading-utxo'])
-					var value = data.value
-					if(value >= amount) {
-						var change = value - amount
-						if ((change * 1) > 0) {
-							tx.addoutput(address, amountFormat(change));
+				$('#status-screen span').html(messages.tx['loading-utxo'])
+				getUnspent(address, amount).then(function(data) {
+					var value = 0
+					for (var i = 0, size = data.result.length; i < size; i++) {
+						var txid = data.result[i].txid
+						var index = data.result[i].index
+						value += data.result[i].value
+
+						var input = {
+							'hash': txid,
+							'index': index,
+							'nonWitnessUtxo': bitcoin.Buffer.from(data.result[i].hex, 'hex')
 						}
+						tx_psbt.addInput(input)
 
-						// clone the transaction with out using coinjs.clone() function as it gives us trouble
-						var txClone = coinjs.transaction()
-						var txUnspent = txClone.deserialize(tx.serialize())
+						amounts.push(data.result.value)
+					}
 
-						// then sign
-						var signed = txUnspent.sign(globalData.keys.wif)
-
-						transactionBroadcast(signed).then(function(data) {
-							if (data.error == undefined) {
-								$('#status-screen span').html(`
-									<a href="` + blockExplorer.tx(data.result) + `" target="_blank">` + data.result + `</a> 
-								`)
-								$('#send-title').text(messages.title['success'])
-							} else {
-								$('#status-screen span').html(messages.error['broadcast-failed'])
-								$('#send-title').text(messages.title['failed'])
-								$('#status-screen .extra-info').html(`
-									<div class="mt-3">
-										<textarea class="form-control" readonly cols="30" rows="10">${data.error.message}</textarea>
-									</div>
-								`)
-							}
-							resetTxForm()
-						})
+					if (value >= amount) {
+						var change = value - amount
+						if (change > 0) {
+							tx_psbt.addOutput({
+								'address': address,
+								'value': change
+							})
+						}
 					} else {
 						showMessage(messages.error['not-enough-funds'])
 					}
 
-				}, script, script, sequence);
+					for (var i = 0, size = amounts.length; i < size; i++) {
+						tx_psbt.signInput(i, keys)
+					}
+
+					tx_psbt.finalizeAllInputs()
+					console.log(tx_psbt.extractTransaction().toHex())
+				})
 			}
 
 			// Close wallet
@@ -4919,7 +4930,7 @@
 
 					$.each($('#send-outputs .send-outputs-item'), function(key, item) {
 						var address = $('[name="send-address"]', item).val().trim()
-						var amount = $('[name="send-address"]', item).val()
+						var amount = $('[name="send-ammount"]', item).val()
 
 						if ((isNaN(amount)) || amount <= 0) {
 							showMessage(messages.error['not-valid-amount'])
@@ -4952,7 +4963,7 @@
 					var wifLength = wif.length
 					if ([51, 52].includes(wifLength)) {
 						try {
-							globalData.keys = bitcoin.ECPair.fromWIF(wif)
+							globalData.keys = bitcoin.ECPair.fromWIF(wif, getConfig()['network'])
 						} catch(e) {
 							showMessage(messages.error['bad-priv-key'])
 						}
@@ -4995,7 +5006,10 @@
 								$('#open-password').val('')
 								$('#open-password-confirm').val('')
 
-								globalData.keys = bitcoin.ECPair.fromPrivateKey(bitcoin.Buffer.from(s, 'hex'))
+								globalData.keys = bitcoin.ECPair.fromPrivateKey(
+									bitcoin.Buffer.from(s, 'hex'),
+									{'network': getConfig()['network']}
+								)
 								openWallet(globalData.keys)
 							} else {
 								showMessage(messages.error['pass-not-match'])
