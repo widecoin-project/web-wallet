@@ -4653,7 +4653,7 @@
 			// Set title
 			function setHomeTitle() {
 				if (globalData.keys != undefined) {
-					setTitle('Address ' + globalData.keys.address)
+					setTitle('Address ' + globalData.address)
 				} else {
 					setTitle('Open Wallet')
 				}
@@ -4825,6 +4825,22 @@
 				return address
 			}
 
+			function validateAddress(address) {
+				var network = getConfig()['network']
+
+				try {
+					bitcoin.address.fromBase58Check(address, network)
+					return true
+				} catch (e) {
+					try {
+						bitcoin.address.fromBech32(address, network)
+						return true
+					} catch (e) {
+						return false
+					}
+				}
+			}
+
 			// Create new wallet
 			$('#footer-create').click(function() {
 				var keys = bitcoin.ECPair.makeRandom({'network': getConfig()['network']})
@@ -4910,7 +4926,7 @@
 							error = true
 						}
 
-						if (coinjs.addressDecode(address) == false) {
+						if (validateAddress(address) == false) {
 							showMessage(messages.error['not-valid-address'])
 							error = true
 						}
