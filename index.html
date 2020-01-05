@@ -4283,6 +4283,7 @@
 					<div class="modal-footer">
 						<button id="send-cancel" type="button" class="btn btn-block mr-auto btn-dark" data-dismiss="modal">Cancel</button>
 						<button id="send-confirm" type="button" class="btn btn-block mt-0 mr-auto btn-primary">Yes, send it!</button>
+						<button id="send-close-footer" type="button" class="btn btn-block mt-0 mr-auto btn-dark d-none disabled" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
@@ -4305,7 +4306,7 @@
 		<script>
 			// Config
 			var walletTimer = false
-			var walletVersion = '0.3'
+			var walletVersion = '0.3.1'
 			var networkConfigs = {
 				'SUGAR': {
 					'uri': 'sugarchain:',
@@ -4726,6 +4727,8 @@
 				$('#send-title').text(messages.title['sure'])
 				$('#send-cancel').removeClass('disabled')
 				$('#send-confirm').removeClass('disabled')
+				$('#send-close-footer').addClass('d-none')
+				$('#send-close-footer').addClass('disabled')
 				$('#confirm-screen').removeClass('d-none')
 				$('#status-screen').addClass('d-none')
 				$('#status-screen span').html('')
@@ -4846,6 +4849,11 @@
 							}
 							resetTxForm()
 						})
+
+						$('#send-cancel').addClass('d-none')
+						$('#send-confirm').addClass('d-none')
+						$('#send-close-footer').removeClass('d-none')
+						$('#send-close-footer').removeClass('disabled')
 
 					} else {
 						showMessage(messages.error['not-enough-funds'])
