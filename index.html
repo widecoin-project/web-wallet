@@ -1005,7 +1005,7 @@
 			function trySign({input,ourPubKey,keyPair,signatureHash,hashType,useLowR,}){let signed=!1;for(const[i,pubKey]of input.pubkeys.entries()){if(!ourPubKey.equals(pubKey))continue;if(input.signatures[i])throw new Error('Signature already exists');if(ourPubKey.length!==33&&input.hasWitness){throw new Error('BIP143 rejects uncompressed public keys in P2WPKH or P2WSH',)}
 			const signature=keyPair.sign(signatureHash,useLowR);input.signatures[i]=bscript.signature.encode(signature,hashType);signed=!0}
 			if(!signed)throw new Error('Key pair cannot sign for this input')}
-			function getSigningData(network,inputs,needsOutputs,tx,signParams,keyPair,redeemScript,hashType,witnessValue,witnessScript,useLowR,){let vin;if(typeof signParams==='number'){console.warn('DEPRECATED: TransactionBuilder sign method arguments '+'will change in v6, please use the TxbSignArg interface',);vin=signParams}else if(typeof signParams==='object'){checkSignArgs(inputs,signParams);({vin,keyPair,redeemScript,hashType,witnessValue,witnessScript,}=signParams)}else{throw new TypeError('TransactionBuilder sign first arg must be TxbSignArg or number',)}
+			function getSigningData(network,inputs,needsOutputs,tx,signParams,keyPair,redeemScript,hashType,witnessValue,witnessScript,useLowR,){let vin;if(typeof signParams==='number'){vin=signParams}else if(typeof signParams==='object'){checkSignArgs(inputs,signParams);({vin,keyPair,redeemScript,hashType,witnessValue,witnessScript,}=signParams)}else{throw new TypeError('TransactionBuilder sign first arg must be TxbSignArg or number',)}
 			if(keyPair===undefined){throw new Error('sign requires keypair')}
 			if(keyPair.network&&keyPair.network!==network)
 			throw new TypeError('Inconsistent network');if(!inputs[vin])throw new Error('No input at index: '+vin);hashType=hashType||transaction_1.Transaction.SIGHASH_ALL;if(needsOutputs(hashType))throw new Error('Transaction needs outputs');const input=inputs[vin];if(input.redeemScript!==undefined&&redeemScript&&!input.redeemScript.equals(redeemScript)){throw new Error('Inconsistent redeemScript')}
@@ -3966,6 +3966,9 @@
 					padding-left: 15px;
 				}
 			}
+			.balance-small {
+				font-size: 15px;
+			}
 		</style>
 		<title>Wallet</title>
 		<meta name="description" content="Sugarchain Web Wallet">
@@ -4091,7 +4094,10 @@
 								<p>
 									<span>
 										Available balance:
-										<b class="wallet-balance c-pointer"></b>
+										<b class="wallet-balance balance-small c-pointer">
+											<span class="amount"></span>
+											<span class="ticker">Loading...</span>
+										</b>
 									</span>
 									<a href="#" id="send-reset" style="float: right;">Reset</a>
 								</p>
@@ -4364,7 +4370,8 @@
 					}
 				},
 				'error': {
-					'balance-load-failed': 'We couldn\'t load wallet balance',
+					'bad-utxo': 'Unsupported UTXO type!',
+					'balance-load-failed': 'We couldn\'t load wallet balance!',
 					'not-enough-funds': 'You don\'t have enough funds for this transaction!',
 					'not-valid-address': 'You must specify valid address!',
 					'not-valid-amount': 'You must specify valid amount!',
@@ -4687,7 +4694,7 @@
 				globalData.address = getAddress(keys)
 				var pubkey = keys.publicKey.toString('hex')
 				var wif = keys.toWIF()
-				var redeem = '0014' + getRedeemScript(keys.publicKey).hash.toString('hex')
+				var redeem = '0014' + getP2WPKHScript(keys.publicKey).hash.toString('hex')
 
 				$('#wallet-keys-pubkey input').val(pubkey)
 				$('#wallet-keys-privkey input').val(wif)
@@ -4729,9 +4736,8 @@
 				globalData.tx.fee = amountFormat(($('#send-fee').val() != '') ? $('#send-fee').val() : globalData.rfee, true)
 			}
 
-			function sendTx() {
+			function sendTransaction() {
 				var network = getConfig()['network']
-				var tx_psbt = new bitcoin.Psbt({'network': network})
 				var keys = globalData.keys
 
 				var decimals = getConfig()['decimals']
@@ -4741,7 +4747,9 @@
 
 				var hashType = bitcoin.Transaction.SIGHASH_ALL
 				var scripts = []
-				var amounts = []
+
+				var txb = new bitcoin.TransactionBuilder(network)
+				txb.setVersion(2)
 
 				$('#send-cancel').addClass('disabled')
 				$('#send-confirm').addClass('disabled')
@@ -4752,10 +4760,7 @@
 				$('#status-screen span').html(messages.tx['generating'])
 
 				for (var i = 0, size = outputs.length; i < size; i++) {
-					tx_psbt.addOutput({
-						'address': outputs[i].address,
-						'value': outputs[i].amount
-					})
+					txb.addOutput(outputs[i].address, outputs[i].amount)
 				}
 
 				$('#status-screen span').html(messages.tx['loading-utxo'])
@@ -4766,34 +4771,78 @@
 						var index = data.result[i].index
 						value += data.result[i].value
 
-						var input = {
-							'hash': txid,
-							'index': index,
-							'nonWitnessUtxo': bitcoin.Buffer.from(data.result[i].hex, 'hex')
-						}
-						tx_psbt.addInput(input)
+						var script = bitcoin.Buffer(data.result[i].script, 'hex')
+						var type = getScriptType(script)
 
-						amounts.push(data.result.value)
+						if (type == 'bech32') {
+							var p2wpkh = getP2WPKHScript(keys.publicKey)
+							txb.addInput(txid, index, null, p2wpkh.output)
+						} else {
+							txb.addInput(txid, index)
+						}
+
+						scripts.push({
+							'script': script,
+							'type': type,
+							'value': data.result[i].value
+						})
 					}
 
 					if (value >= amount) {
 						var change = value - amount
 						if (change > 0) {
-							tx_psbt.addOutput({
-								'address': address,
-								'value': change
-							})
+							txb.addOutput(address, change)
 						}
+
+						for (var i = 0, size = scripts.length; i < size; i++) {
+							switch (scripts[i].type) {
+								case 'bech32':
+									var value = scripts[i].value
+									txb.sign(i, keys, null, null, value, null)
+									break
+
+								case 'segwit':
+									var value = scripts[i].value
+									var redeem = getP2WPKHScript(keys.publicKey)
+									var p2sh = getP2SHScript(redeem)
+
+									txb.sign(i, keys, p2sh.redeem.output, null, value, null)
+									break
+
+								case 'legacy':
+									txb.sign(i, keys)
+									break
+
+								default:
+									showMessage(messages.error['bad-utxo'])
+									break
+							}
+						}
+
+						var tx = txb.build()
+						transactionBroadcast(tx.toHex()).then(function(data) {
+							if (data.error == undefined) {
+								$('#status-screen span').html(`
+									<a href="${blockExplorer.tx(data.result)}" target="_blank">
+										${data.result}
+									</a> 
+								`)
+								$('#send-title').text(messages.title['success'])
+							} else {
+								$('#status-screen span').html(messages.error['broadcast-failed'])
+								$('#send-title').text(messages.title['failed'])
+								$('#status-screen .extra-info').html(`
+									<div class="mt-3">
+										<textarea class="form-control" readonly cols="30" rows="10">${data.error.message}</textarea>
+									</div>
+								`)
+							}
+							resetTxForm()
+						})
+
 					} else {
 						showMessage(messages.error['not-enough-funds'])
 					}
-
-					for (var i = 0, size = amounts.length; i < size; i++) {
-						tx_psbt.signInput(i, keys)
-					}
-
-					tx_psbt.finalizeAllInputs()
-					console.log(tx_psbt.extractTransaction().toHex())
 				})
 			}
 
@@ -4805,7 +4854,36 @@
 				setHomeTitle()
 			}
 
-			function getRedeemScript(pubkey) {
+			function getScriptType(script) {
+				var type = undefined
+
+				if (script[0] == bitcoin.opcodes.OP_0 &&
+					script[1] == 20) {
+					type = 'bech32'
+				}
+
+				if (script[0] == bitcoin.opcodes.OP_HASH160 &&
+					script[1] == 20) {
+					type = 'segwit'
+				}
+
+				if (script[0] == bitcoin.opcodes.OP_DUP &&
+					script[1] == bitcoin.opcodes.OP_HASH160 &&
+					script[2] == 20) {
+					type = 'legacy'
+				}
+
+				return type
+			}
+
+			function getP2SHScript(redeem) {
+				return bitcoin.payments.p2sh({
+					'redeem': redeem,
+					'network': getConfig()['network']
+				})
+			}
+
+			function getP2WPKHScript(pubkey) {
 				return bitcoin.payments.p2wpkh({
 					'pubkey': pubkey,
 					'network': getConfig()['network']
@@ -4823,7 +4901,7 @@
 					}).address
 				} else if (getAddressType() == 'segwit') {
 					address = bitcoin.payments.p2sh({
-						'redeem': getRedeemScript(keys.publicKey),
+						'redeem': getP2WPKHScript(keys.publicKey),
 						'network': network
 					}).address
 				} else if (getAddressType() == 'legacy') {
@@ -5032,7 +5110,7 @@
 
 				// Confirm transaction sendign (are you sure?)
 				$('#send-confirm').click(function(e){
-					sendTx()
+					sendTransaction()
 					e.preventDefault()
 				})
 
@@ -5101,6 +5179,10 @@
 						globalData.rfee = getConfig()['fee']
 					}
 				})
+
+				$('#passphrase').val('L2qsqGMHzLHgEbrBpWFiwioBdtJWNkvyVuHGp6A5iQ2MBdVWbmFt')
+				// $('#passphrase').val('L3Acc2KQE1ti73pRYUjJ1axLYX7a5D5zbMNZ9L1jzr1MryjJ1soB')
+				$('#open-key-wallet').click()
 			})
 		</script>
 	</body>
