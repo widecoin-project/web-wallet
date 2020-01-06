@@ -4518,7 +4518,7 @@
 			function routePage() {
 				var urlParams = readParams()
 				if (window.location.hash == '') {
-					window.location.hash = '#/'
+					window.location.replace(window.location.href.split('#')[0] + '#/')
 				}
 
 				if (urlParams[0] == '#') {
