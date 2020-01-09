@@ -561,11 +561,15 @@
 				})
 
 				setTitle(getText('wallet-settings'))
+				return language
 			}
 
 			// Get current wallet language translation token
 			function getText(token) {
 				var language = readCookie('language')
+				if (language == undefined) {
+					language = initLang()
+				}
 
 				if (token in walletLanguages[language]) {
 					return walletLanguages[language][token]
