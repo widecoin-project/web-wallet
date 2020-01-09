@@ -1,7 +1,7 @@
 var walletLanguages = {
 	'en': {
 		'lang-alias': 'English',
-		'wallet-title': 'Walelt',
+		'wallet-title': 'Wallet',
 		'open-regular': 'Regular wallet',
 		'open-key': 'Open by key',
 		'disclaimer': 'This page uses javascript to generate your addresses and sign your transactions within your browser, this means we never receive your private keys, this can be independently verified by reviewing the source code on Github.',
