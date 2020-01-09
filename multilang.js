@@ -151,7 +151,7 @@ var walletLanguages = {
 	},
 	'id': {
 		'lang-alias': 'Indonesian',
-		'wallet-title' : 'Dompet',
+		'wallet-title' : 'Wallet',
 		'open-regular': 'Buka dompet',
 		'open-key': 'Buka dengan kunci',
 		'disclaimer': 'Halaman ini menggunakan javascript untuk menghasilkan alamat dompet dan menandatangani transaksi Anda, ini berarti kami tidak pernah menerima kunci domprt pribadi Anda, ini diverifikasi secara terpisah dengan melihat sumber code di Github.',
