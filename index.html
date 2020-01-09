@@ -43,7 +43,7 @@
 				margin-right: 5px;
 			}
 			.b-width {
-				width: 90px;
+				width: 100px;
 			}
 			.navbar-dark .navbar-nav .nav-link.active {
 				color: rgba(255,255,255,.75);
@@ -102,7 +102,7 @@
 			<div class="container">
 				<a href="#" class="navbar-brand">
 					<svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2334.36 2334.36"><defs><style>.cls-1{fill:#fff;}</style></defs><title>sug white</title><path class="cls-1" d="M1049.8,669.06l-545,519.05-.14,2,470.65,32.47,589-603.9Zm566.57-103.61,432,748.49-543.06,672L936.07,1837.25,443.65,1185.86l593.23-565,39.08-3.83,540.27-53Z" transform="translate(-83.54 -82.07)"/><path class="cls-1" d="M1250.72,82.07c644.61,0,1167.18,522.56,1167.18,1167.18S1895.33,2416.43,1250.72,2416.43,83.54,1893.86,83.54,1249.25,606.1,82.07,1250.72,82.07ZM2301.18,1366c64.46-580.16-353.59-1102.72-933.74-1167.18S264.72,552.36,200.26,1132.52,553.85,2235.25,1134,2299.7,2236.72,1946.11,2301.18,1366Z" transform="translate(-83.54 -82.07)"/></svg>
-					<b>Wallet</b>
+					<b tkey="wallet"></b>
 				</a>
 				<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
@@ -110,16 +110,16 @@
 				<div class="collapse navbar-collapse" id="navbarResponsive">
 					<ul class="navbar-nav ml-auto">
 						<li class="nav-item">
-							<a href="#" class="nav-link router-link mr-md-2" data-route="homepage">Home</a>
+							<a href="#" class="nav-link router-link mr-md-2" data-route="homepage" tkey="home"></a>
 						</li>
 						<li class="nav-item">
-							<a href="#/create" class="nav-link router-link mr-md-2" data-route="create">Create</a>
+							<a href="#/create" class="nav-link router-link mr-md-2" data-route="create" tkey="create"></a>
 						</li>
 						<li class="nav-item">
-							<a href="#/broadcast" class="nav-link router-link mr-md-2" data-route="broadcast">Broadcast</a>
+							<a href="#/broadcast" class="nav-link router-link mr-md-2" data-route="broadcast" tkey="broadcast"></a>
 						</li>
 						<li class="nav-item">
-							<a href="#/settings" class="nav-link router-link mr-md-2" data-route="settings">Settings</a>
+							<a href="#/settings" class="nav-link router-link mr-md-2" data-route="settings" tkey="settings"></a>
 						</li>
 						<li class="nav-item dropdown" id="network-list">
 							<a class="nav-item nav-link dropdown-toggle" href="#" id="network-versions" data-toggle="dropdown">NETWORK</a>
@@ -145,41 +145,40 @@
 						<div class="card-header">
 							<ul class="nav nav-tabs card-header-tabs">
 								<li class="nav-item mr-2">
-									<a class="nav-link tab-link active" data-tab-name="open-regular" data-tab-family="open-block" href="#">Regular wallet</a>
+									<a class="nav-link tab-link active" data-tab-name="open-regular" data-tab-family="open-block" href="#" tkey="open-regular"></a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link tab-link" data-tab-name="open-key" data-tab-family="open-block" href="#">Open by key</a>
+									<a class="nav-link tab-link" data-tab-name="open-key" data-tab-family="open-block" href="#" tkey="open-key"></a>
 								</li>
 							</ul>
 						</div>
 						<div class="card-body">
 							<form id="open-regular-form" class="open-form tab-item" data-tab="open-regular">
 								<div class="input-group pb-2">
-									<input id="open-email" name="open-email" class="form-control" placeholder="Email address" type="text">
+									<input id="open-email" name="open-email" class="form-control" type="text" tkey="email-address">
 								</div>
 								<div class="input-group">
-									<input id="open-password" name="open-password" class="form-control" placeholder="Password" type="password">
-									<input id="open-password-confirm" name="open-password-confirm" class="form-control" placeholder="Confirm password" type="password">
+									<input id="open-password" name="open-password" class="form-control" type="password" tkey="password">
+									<input id="open-password-confirm" name="open-password-confirm" class="form-control" type="password" tkey="password-confirm">
 									<div class="input-group-append">
-										<button class="btn btn-outline-dark b-width" type="submit" id="open-regular-wallet">Open</button>
+										<button class="btn btn-outline-dark b-width" type="submit" id="open-regular-wallet" tkey="open"></button>
 									</div>
 								</div>
 							</form>
 							<form id="open-key-form" class="open-form tab-item d-none" data-tab="open-key">
 								<div class="input-group">
-									<input id="passphrase" name="passphrase" class="form-control" placeholder="WIF private key" type="password">
+									<input id="passphrase" name="passphrase" class="form-control" type="password" tkey="wif-key">
 									<div class="input-group-append">
-										<button class="btn btn-outline-dark b-width" type="submit" id="open-key-wallet">Open</button>
+										<button class="btn btn-outline-dark b-width" type="submit" id="open-key-wallet" tkey="open"></button>
 									</div>
 								</div>
 							</form>
 						</div>
 						<div class="card-footer">
-							<div class="footer-item tab-item" data-tab="open-regular">
-								<b>Notice:</b> Please make sure that you remember your account details, otherwise you may lose access to your funds.
+							<div class="footer-item tab-item" data-tab="open-regular" tkey="open-reminder">
 							</div>
 							<div class="footer-item tab-item d-none" data-tab="open-key">
-								Still don't have wallet? <a id="paper-wallet" href="#/create">Generate</a> it!
+								<span tkey="generate-question"></span> <span tkey="generate-it"></span>
 							</div>
 						</div>
 					</div>
@@ -189,16 +188,16 @@
 						<div class="card-header">
 							<ul class="nav nav-tabs card-header-tabs">
 								<li class="nav-item mr-2">
-									<a class="nav-link tab-link active" data-tab-name="wallet-balance" data-tab-family="wallet-block" href="#">Wallet</a>
+									<a class="nav-link tab-link active" data-tab-name="wallet-balance" data-tab-family="wallet-block" href="#" tkey="wallet"></a>
 								</li>
 								<li class="nav-item mr-2">
-									<a class="nav-link tab-link" data-tab-name="wallet-send" data-tab-family="wallet-block" href="#">Send</a>
+									<a class="nav-link tab-link" data-tab-name="wallet-send" data-tab-family="wallet-block" href="#" tkey="send"></a>
 								</li>
 								<li class="nav-item mr-2">
-									<a id="history-link" class="nav-link" target="_blank" href="https://sugar.wtf/#/address/">History</a>
+									<a id="history-link" class="nav-link" target="_blank" href="https://sugar.wtf/#/address/" tkey="history"></a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link tab-link" data-tab-name="wallet-keys" data-tab-family="wallet-block" href="#">Keys</a>
+									<a class="nav-link tab-link" data-tab-name="wallet-keys" data-tab-family="wallet-block" href="#" tkey="keys"></a>
 								</li>
 							</ul>
 						</div>
@@ -209,7 +208,7 @@
 									<div id="wallet-address"></div>
 									<div class="wallet-balance mb-0 pb-0 c-pointer">
 										<span class="text-monospace amount"></span>
-										<span class="ticker">Loading...</span>
+										<span class="ticker" tkey="loading"></span>
 									</div>
 								</div>
 							</div>
@@ -217,19 +216,19 @@
 							<div id="wallet-send" class="tab-item d-none" data-tab="wallet-send">
 								<p>
 									<span>
-										Available balance:
+										<span tkey="available-balance"></span>
 										<b class="wallet-balance balance-small c-pointer">
 											<span class="amount"></span>
-											<span class="ticker">Loading...</span>
+											<span class="ticker" tkey="loading"></span>
 										</b>
 									</span>
-									<a href="#" id="send-reset" style="float: right;">Reset</a>
+									<a href="#" id="send-reset" style="float: right;" tkey="reset"></a>
 								</p>
 								
 								<div id="send-outputs">
 									<div class="input-group send-outputs-item mb-2">
-										<input name="send-address" class="form-control" placeholder="Enter address" type="text" value="">
-										<input name="send-ammount" class="form-control" placeholder="Amount" type="text" value="">
+										<input name="send-address" class="form-control" type="text" value="" tkey="enter-address">
+										<input name="send-ammount" class="form-control" type="text" value="" tkey="amount">
 										<div class="input-group-append">
 											<button id="add-output" class="btn btn-success">
 												<span class="entypo plus"></span>
@@ -241,7 +240,7 @@
 								<div class="input-group">
 									<input id="send-fee" class="form-control" placeholder="Fee" type="text" value="">
 									<div class="input-group-append">
-										<button class="btn btn-outline-dark b-width" type="submit" id="send-tx">Send</button>
+										<button class="btn btn-outline-dark b-width" type="submit" id="send-tx" tkey="send"></button>
 									</div>
 								</div>
 							</div>
@@ -249,19 +248,19 @@
 							<div class="tab-item d-none" data-tab="wallet-keys">
 								<div id="wallet-keys">
 									<div id="wallet-keys-pubkey">
-										<label>Public Key</label>
+										<label tkey="public-key"></label>
 										<div class="input-group pb-2">
 											<input class="form-control" readonly type="text">
 										</div>
 									</div>
 
 									<div id="wallet-keys-privkey">
-										<label>Private Key</label>
+										<label tkey="private-key"></label>
 										<div class="input-group pb-2">
 											<div class="input-group">
 												<input class="form-control keys-privkey privkey" readonly data-original-title="" title="" type="password">
 												<span class="input-group-append">
-													<button class="btn btn-outline-dark b-width toggle-priv-key" type="button">Show</button>
+													<button class="btn btn-outline-dark b-width toggle-priv-key" type="button" tkey="show"></button>
 												</span>
 											</div>
 										</div>
@@ -277,7 +276,7 @@
 							</div>
 						</div>
 						<div class="card-footer">
-							<button id="footer-close" type="button" class="btn btn-danger btn-block footer-item">Close</button>
+							<button id="footer-close" type="button" class="btn btn-danger btn-block footer-item" tkey="close"></button>
 						</div>
 					</div>
 				</div>
@@ -289,31 +288,31 @@
 			<div class="container">
 				<div class="card mb-3">
 					<div class="card-header">
-						<b>Create wallet</b>
+						<b tkey="create-wallet"></b>
 					</div>
 					<div class="card-body">
 						<div id="create-keys">
 							<div id="create-keys-address">
-								<label>Address</label>
+								<label tkey="address"></label>
 								<div class="input-group pb-2">
 									<input class="form-control" readonly type="text">
 								</div>
 							</div>
 
 							<div id="create-keys-pubkey">
-								<label>Public Key</label>
+								<label tkey="public-key"></label>
 								<div class="input-group pb-2">
 									<input class="form-control" readonly type="text">
 								</div>
 							</div>
 
 							<div id="create-keys-privkey">
-								<label>Private Key</label>
+								<label tkey="private-key"></label>
 								<div class="input-group pb-2">
 									<div class="input-group">
 										<input class="form-control keys-privkey privkey" readonly data-original-title="" title="" type="password">
 										<span class="input-group-append">
-											<button class="btn btn-outline-dark b-width toggle-priv-key" type="button">Show</button>
+											<button class="btn btn-outline-dark b-width toggle-priv-key" type="button" tkey="show"></button>
 										</span>
 									</div>
 								</div>
@@ -321,7 +320,7 @@
 						</div>
 					</div>
 					<div class="card-footer">
-						<button id="footer-create" type="button" class="btn btn-primary btn-block footer-item">Create</button>
+						<button id="footer-create" type="button" class="btn btn-primary btn-block footer-item" tkey="create"></button>
 					</div>
 				</div>
 			</div>
@@ -332,13 +331,13 @@
 			<div class="container">
 				<div class="card mb-3">
 					<div class="card-header">
-						<b>Broadcast transaction</b>
+						<b tkey="broadcast-transaction"></b>
 					</div>
 					<div class="card-body">
-						<textarea class="form-control" id="transaction-broadcast-raw" placeholder="Enter your signed raw transaction" rows="4"></textarea>
+						<textarea class="form-control" id="transaction-broadcast-raw" rows="4" tkey="enter-transaction"></textarea>
 					</div>
 					<div class="card-footer">
-						<button id="footer-broadcast" type="button" class="btn btn-primary btn-block footer-item">Broadcast</button>
+						<button id="footer-broadcast" type="button" class="btn btn-primary btn-block footer-item" tkey="broadcast"></button>
 					</div>
 				</div>
 			</div>
@@ -349,11 +348,11 @@
 			<div class="container">
 				<div class="card mb-3">
 					<div class="card-header">
-						<b>Wallet settings</b>
+						<b tkey="wallet-settings"></b>
 					</div>
 					<div class="card-body">
 						<div id="address-type-select">
-							<label>Address Type</label>
+							<label tkey="address-type"></label>
 							<div class="input-group pb-2">
 								<select class="custom-select">
 									<option>bech32</option>
@@ -363,17 +362,23 @@
 							</div>
 						</div>
 						<div id="wallet-backend">
-							<label>Wallet Backend</label>
-							<div class="input-group">
-								<input class="form-control" type="text" placeholder="Wallet API backend">
+							<label tkey="wallet-backend"></label>
+							<div class="input-group pb-2">
+								<input class="form-control" type="text" tkey="wallet-api">
 								<span class="input-group-append">
-									<button class="btn btn-outline-dark b-width" type="button">Update</button>
+									<button class="btn btn-outline-dark b-width" type="button" tkey="update"></button>
 								</span>
+							</div>
+						</div>
+						<div id="wallet-language-select">
+							<label tkey="wallet-language"></label>
+							<div class="input-group">
+								<select class="custom-select"></select>
 							</div>
 						</div>
 					</div>
 					<div class="card-footer">
-						Version: <b id="wallet-version"></b>
+						<span tkey="version"></span> <b id="wallet-version"></b>
 					</div>
 				</div>
 			</div>
@@ -390,7 +395,7 @@
 					</div>
 					<div class="modal-body">
 						<div id="confirm-screen">
-							You are one step away from sending <strong id="confirm-amount">0 SUGAR</strong>. This action <strong>cannot</strong> be reversed. Are you sure about this?
+							<span tkey="send-warning"></span> <strong id="confirm-amount"></strong>. <span tkey="send-warning-reverse"></span>
 						</div>
 						<div id="status-screen" class="break-lines d-none">
 							<span></span>
@@ -398,9 +403,9 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button id="send-cancel" type="button" class="btn btn-block mr-auto btn-dark" data-dismiss="modal">Cancel</button>
-						<button id="send-confirm" type="button" class="btn btn-block mt-0 mr-auto btn-primary">Yes, send it!</button>
-						<button id="send-close-footer" type="button" class="btn btn-block mt-0 mr-auto btn-dark d-none disabled" data-dismiss="modal">Close</button>
+						<button id="send-cancel" type="button" class="btn btn-block mr-auto btn-dark" data-dismiss="modal" tkey="cancel"></button>
+						<button id="send-confirm" type="button" class="btn btn-block mt-0 mr-auto btn-primary" tkey="send-it"></button>
+						<button id="send-close-footer" type="button" class="btn btn-block mt-0 mr-auto btn-dark d-none disabled" data-dismiss="modal" tkey="close"></button>
 					</div>
 				</div>
 			</div>
@@ -408,7 +413,7 @@
 
 		<div class="disclaimer mb-3">
 			<div class="container text-center">
-				<small class="text-muted" style="max-width: 1100px;">This page uses javascript to generate your addresses and sign your transactions within your browser, this means we never receive your private keys, this can be independently verified by reviewing the source code on github.</small>
+				<small class="text-muted" style="max-width: 1100px;" tkey="disclaimer"></small>
 			</div>
 		</div>
 
@@ -421,12 +426,164 @@
 
 		<!-- All magic is here :D -->
 		<script>
+			var walletLanguages = {
+				'en': {
+					'lang-alias': 'English',
+					'open-regular': 'Regular wallet',
+					'open-key': 'Open by key',
+					'disclaimer': 'This page uses javascript to generate your addresses and sign your transactions within your browser, this means we never receive your private keys, this can be independently verified by reviewing the source code on Github.',
+					'open-reminder': '<b>Notice:</b> Please make sure that you remember your account details, otherwise you may lose access to your funds.',
+					'open': 'Open',
+					'home': 'Home',
+					'create': 'Create',
+					'broadcast': 'Broadcast',
+					'settings': 'Settings',
+					'email-address': 'Email address',
+					'password': 'Password',
+					'password-confirm': 'Confirm password',
+					'generate-question': 'Still don\'t have wallet?',
+					'generate-it': '<a href="#/create">Generate</a> it!',
+					'wif-key': 'WIF Private key',
+					'create-wallet': 'Create wallet',
+					'show': 'Show',
+					'hide': 'Hide',
+					'address': 'Address',
+					'public-key': 'Public Key',
+					'private-key': 'Private Key',
+					'broadcast-transaction': 'Broadcast transaction',
+					'enter-transaction': 'Enter your signed transaction',
+					'wallet-settings': 'Wallet settings',
+					'address-type': 'Address Type',
+					'wallet-backend': 'Wallet Backend',
+					'update': 'Update',
+					'wallet-language': 'Wallet Language',
+					'version': 'Version:',
+					'wallet': 'Wallet',
+					'close': 'Close',
+					'send': 'Send',
+					'history': 'Hisotry',
+					'keys': 'Keys',
+					'reset': 'Reset',
+					'available-balance': 'Available balance:',
+					'enter-address': 'Enter address',
+					'amount': 'Amount',
+					'fee': 'Fee',
+					'recommended': 'recommended',
+					'loading': 'Loading...',
+					'send-sure': 'Are you sure?',
+					'send-processing': 'Processing...',
+					'success': 'Success',
+					'failed': 'Failed',
+					'send-it': 'Yes, send it!',
+					'cancel': 'Cancel',
+					'send-warning': 'You are one step away from sending',
+					'send-warning-reverse': 'This action <strong>cannot</strong> be reversed. Are you sure about this?',
+					'loading-utxo': 'Loading UTXOs...',
+					'transaction-creation': 'Creating transaction...',
+					'transaction-broadcasted': 'Transaction successfully broadcasted: ',
+					'close': 'Close',
+					'address-type-changed': 'Address type changed to',
+					'backend-switched': 'Backend is switched to',
+					'backend-down': 'don\'t seems to be available',
+					'wallet-api': 'Wallet API backend',
+					'open-wallet': 'Open Wallet',
+					'bad-utxo': 'Unsupported UTXO type!',
+					'balance-load-failed': 'We couldn\'t load wallet balance!',
+					'not-enough-funds': 'You don\'t have enough funds for this transaction!',
+					'not-valid-address': 'You must specify valid address!',
+					'not-valid-amount': 'You must specify valid amount!',
+					'not-valid-fee': 'You must specify valid fee!',
+					'bad-priv-key': 'Bad WIF private key!',
+					'not-enough-utxo': 'Not enough UTXO :(',
+					'broadcast-failed': 'Transaction broadcast failed :(',
+					'pass-not-match': 'Your passwords do not match!',
+					'pass-too-short': 'Your password must be at least 10 chars long!',
+					'bad-email': 'Your email address doesn\'t appear to be valid!',
+					'small-fee': 'You should specify fee not less than'
+				},
+				'uk': {
+					'lang-alias': 'Українська',
+					'open-regular': 'Звичайний гаманець',
+					'open-key': 'Відкрити ключем',
+					'disclaimer': 'Ця сторінка використовує javascript для генерації ваших адрес та підпису транзакцій всередині браузера, це означає, що ми ніколи не отримуємо ваші приватні ключі, це можна перевірити незалежно, переглянувши вихідний код на Github.',
+					'open-reminder': '<b>Увага:</b> Будь ласка переконайтесь, що ви запам\'ятали дані вашого акаунту, інакше ви можете втратити доступ до ваших коштів.',
+					'open': 'Відкрити',
+					'home': 'Домівка',
+					'create': 'Створити',
+					'broadcast': 'Транслювати',
+					'settings': 'Налаштування',
+					'email-address': 'Електронна пошта',
+					'password': 'Пароль',
+					'password-confirm': 'Підтвердіть пароль',
+					'generate-question': 'Все ще не маєте гаманця?',
+					'generate-it': '<a href="#/create">Згенеруйте</a> його!',
+					'wif-key': 'Приватний ключ WIF',
+					'create-wallet': 'Створити гаманець',
+					'show': 'Показати',
+					'hide': 'Сховати',
+					'address': 'Адреса',
+					'public-key': 'Публічний Ключ',
+					'private-key': 'Приватний Ключ',
+					'broadcast-transaction': 'Транслювати транзакцію',
+					'enter-transaction': 'Введіть вашу підписану транзакцію',
+					'wallet-settings': 'Налаштування гаманця',
+					'address-type': 'Тип Адреси',
+					'wallet-backend': 'Бекенд Гаманця',
+					'update': 'Оновити',
+					'wallet-language': 'Мова Гаманця',
+					'version': 'Версія:',
+					'wallet': 'Гаманець',
+					'close': 'Закрити',
+					'send': 'Надіслати',
+					'history': 'Історія',
+					'keys': 'Ключі',
+					'reset': 'Скинути',
+					'available-balance': 'Доступний баланс:',
+					'enter-address': 'Введіть адресу',
+					'amount': 'Сума',
+					'fee': 'Комісія',
+					'recommended': 'рекомендовано',
+					'loading': 'Завантаження...',
+					'send-sure': 'Ви впевенені?',
+					'send-processing': 'Обробка...',
+					'success': 'Успіх',
+					'failed': 'Невдача',
+					'send-it': 'Так, надіслати!',
+					'cancel': 'Скасувати',
+					'send-warning': 'Ви в одному кроці від того, щоб надіслати',
+					'send-warning-reverse': 'Ця дія <strong>не може</strong> бути скасованою. Ви впевнені?',
+					'loading-utxo': 'Завантаження UTXOs...',
+					'transaction-creation': 'Створення транзакції...',
+					'transaction-broadcasted': 'Транзакція успішно надіслана: ',
+					'close': 'Закрити',
+					'address-type-changed': 'Тип адрес змінений на',
+					'backend-switched': 'Бекенд змінений на',
+					'backend-down': 'виглядає мертвим',
+					'wallet-api': 'API Бекенд гаманця',
+					'open-wallet': 'Відкрити Гаманець',
+					'bad-utxo': 'Непідтримуваний тип UTXO!',
+					'balance-load-failed': 'Нам не вдалося завантажити баланс вашого гаманця!',
+					'not-enough-funds': 'У вас не достатньо коштів для цієї транзакції!',
+					'not-valid-address': 'Ви маєте ввести дійсну адресу!',
+					'not-valid-amount': 'Ви маєте ввести дійсну суму!',
+					'not-valid-fee': 'Ви маєте ввести дійсну комісію!',
+					'bad-priv-key': 'Недійсний WIF приватний ключ WIF!',
+					'not-enough-utxo': 'Не достатньо UTXO :(',
+					'broadcast-failed': 'Не вдалося транслювати транзакцію :(',
+					'pass-not-match': 'Паролі не не збігаються!',
+					'pass-too-short': 'Ваш пароль повинен бути не менше 10 символів!',
+					'bad-email': 'Схоже, що ви ввели не дійсну поштову скриньку!',
+					'small-fee': 'Ви маєте задати комісію не менше ніж'
+				}
+			}
+
 			// Config
 			var walletTimer = false
 			var walletVersion = '0.3.1'
 			var networkConfigs = {
 				'SUGAR': {
 					'uri': 'sugarchain:',
+					'title': 'Sugar Wallet',
 					'name': 'Main Network (SUGAR)',
 					'api': 'https://api.sugarchain.org',
 					'ticker': 'SUGAR',
@@ -485,42 +642,83 @@
 			var messages = {
 				'settings': {
 					'typeSwitched': function (type) {
-						return 'Address type changed to <b>' + type + '</b>'
+						return getText('address-type-changed') + ' <b>' + type + '</b>'
 					},
 					'backendSwitched': function (url) {
-						return 'Backend is switched to <b>' + url + '</b>'
+						returngetText('backend-switched') +  ' <b>' + url + '</b>'
 					},
 					'backendNotWorking': function (url) {
-						return 'Backend <b>' + url + '</b> don\'t seems to be available'
+						return '<b>' + url + '</b> ' + getText('backend-down')
 					}
 				},
 				'error': {
-					'bad-utxo': 'Unsupported UTXO type!',
-					'balance-load-failed': 'We couldn\'t load wallet balance!',
-					'not-enough-funds': 'You don\'t have enough funds for this transaction!',
-					'not-valid-address': 'You must specify valid address!',
-					'not-valid-amount': 'You must specify valid amount!',
-					'not-valid-fee': 'You must specify valid fee!',
-					'bad-priv-key': 'Bad WIF private key!',
-					'not-enough-utxo': 'Not enough utxo :(',
-					'broadcast-failed': 'Transaction broadcast failed :(',
-					'pass-not-match': 'Your passwords do not match!',
-					'pass-too-short': 'Your password must be at least 10 chars long!',
-					'bad-email': 'Your email address doesn\'t appear to be valid!',
-					'toSmallFee': function (fee, ticker) {
-						return 'You should specify fee not less than ' + fee + ' ' + ticker + '!'
-					}
+					'bad-utxo': getText('bad-utxo'),
+					'balance-load-failed': getText('balance-load-failed'),
+					'not-enough-funds': getText('not-enough-funds'),
+					'not-valid-address': getText('not-valid-address'),
+					'not-valid-amount': getText('not-valid-amount'),
+					'not-valid-fee': getText('not-valid-fee'),
+					'bad-priv-key': getText('bad-priv-key'),
+					'not-enough-utxo': getText('not-enough-utxo'),
+					'broadcast-failed': getText('broadcast-failed'),
+					'pass-not-match': getText('pass-not-match'),
+					'pass-too-short': getText('pass-too-short'),
+					'bad-email': getText('bad-email'),
+					'small-fee': getText('small-fee') + ' ' + getConfig()['fee'] + ' ' + getConfig()['ticker'] + '!'
 				},
 				'tx': {
-					'loading-utxo': 'Loading UTXOs...',
-					'generating': 'Generating transaction...',
-					'success': 'Transaction successfully broadcasted: ',
+					'loading-utxo': getText('loading-utxo'),
+					'generating': getText('transaction-creation'),
+					'success': getText('transaction-broadcasted'),
 				},
 				'title': {
-					'sure': 'Are you sure?',
-					'processing': 'Processing...',
-					'success': 'Success',
-					'failed': 'Failed'
+					'sure': getText('send-sure'),
+					'processing': getText('send-processing'),
+					'success': getText('success'),
+					'failed': getText('failed')
+				}
+			}
+
+			function initLang() {
+				var language = readCookie('language')
+				var set_lang = 'en'
+
+				if (language == null || walletLanguages[language] == undefined) {
+					var user_lang = navigator.language.substr(0, 2)
+					if (user_lang in walletLanguages) {
+						set_lang = user_lang
+					}
+
+					setCookie('language', set_lang, 60)
+					language = readCookie('language')
+				}
+
+				$('#wallet-language-select select').empty()
+				for (key in walletLanguages) {
+					$('#wallet-language-select select').append($('<option>', {
+						'value': key,
+						'text': walletLanguages[key]['lang-alias']
+					}))
+				}
+
+				$('#wallet-language-select select').val(language)
+				$("[tkey]").each(function() {
+					if (['INPUT', 'TEXTAREA'].indexOf($(this).prop('tagName')) >= 0) {
+						$(this).attr('placeholder', getText($(this).attr('tkey')))
+					} else {
+						$(this).html(getText($(this).attr('tkey')))
+					}
+				})
+			}
+
+			// Get current wallet language translation token
+			function getText(token) {
+				var language = readCookie('language')
+
+				if (token in walletLanguages[language]) {
+					return walletLanguages[language][token]
+				} else {
+					return walletLanguages['en'][token]
 				}
 			}
 
@@ -658,15 +856,15 @@
 							break
 
 						case 'create':
-							setTitle('Create wallet')
+							setTitle(getText('create-wallet'))
 							break
 
 						case 'broadcast':
-							setTitle('Broadcast transaction')
+							setTitle(getText('broadcast-transaction'))
 							break
 
 						case 'settings':
-							setTitle('Wallet settings')
+							setTitle(getText('wallet-settings'))
 							break
 
 						// Swith network
@@ -699,7 +897,7 @@
 
 			// Set window title
 			function setTitle(title) {
-				document.title = title + ' | Sugar Wallet';
+				document.title = title + ' | ' + getConfig()['title'];
 			}
 
 			// Broadcast tx
@@ -734,7 +932,7 @@
 			// Get address UTXO
 			function getUnspent(address, amount) {
 				return Promise.resolve($.ajax({
-					'url': getBackend() + '/unspent/' + address + '?amount=' + amount + '&psbt=true',
+					'url': getBackend() + '/unspent/' + address + '?amount=' + amount,
 				})).then(function(data) {
 					return data
 				})
@@ -779,7 +977,7 @@
 			function walletBalance() {
 				var balance = '0.00'
 				$('.wallet-balance .amount').text('')
-				$('.wallet-balance .ticker').text('Loading...')
+				$('.wallet-balance .ticker').text(getText('loading'))
 
 				addressBalance(globalData.address).then(function(data) {
 					if (data['error'] == undefined) {
@@ -797,9 +995,9 @@
 			// Set title
 			function setHomeTitle() {
 				if (globalData.keys != undefined) {
-					setTitle('Address ' + globalData.address)
+					setTitle(getText('address') + ' ' + globalData.address)
 				} else {
-					setTitle('Open Wallet')
+					setTitle(getText('open-wallet'))
 				}
 			}
 
@@ -807,7 +1005,7 @@
 			function checkBalanceLoop() {
 				clearTimeout(walletTimer);
 				walletTimer = setTimeout(function() {
-					if ($('.wallet-balance .ticker').text() != 'Loading...') {
+					if ($('.wallet-balance .ticker').text() != getText('loading')) {
 						walletBalance()
 					}
 					checkBalanceLoop()
@@ -829,7 +1027,7 @@
 				$('#open-block').addClass('d-none')
 				$('#wallet-block').removeClass('d-none')
 				$('#history-link').attr('href', blockExplorer.address(globalData.address))
-				$('#send-fee').attr('placeholder', 'Fee (recommended ' + globalData.rfee + ' ' + getConfig()['ticker'] + ')')
+				$('#send-fee').attr('placeholder', getText('fee') + ' (' + getText('recommended') + ' ' + globalData.rfee + ' ' + getConfig()['ticker'] + ')')
 				showQrAddress(getConfig()['uri'] + globalData.address)
 
 				// Init wallet stuffs
@@ -1100,6 +1298,8 @@
 
 			// All starts here
 			$(document).ready(function() {
+				initLang()
+
 				$('#wallet-version').text(walletVersion)
 				$('#wallet-backend input').val(getBackend())
 				$('#address-type-select select').val(getAddressType());
@@ -1135,7 +1335,7 @@
 						error = true
 					} else {
 						if (txFee < getConfig()['fee']) {
-							showMessage(messages.error.toSmallFee(getConfig()['fee'], getConfig()['ticker']))
+							showMessage(messages.error['small-fee'])
 							error = true
 						}
 					}
@@ -1250,12 +1450,12 @@
 
 				// Toggle private key visibility
 				$('.toggle-priv-key').click(function(){
-					if ($(this).text() == 'Show') {
+					if ($(this).text() == getText('show')) {
 						$(this).parent().parent().find('.keys-privkey').attr('type', 'text')
-						$(this).text('Hide')
+						$(this).text(getText('hide'))
 					} else {
 						$(this).parent().parent().find('.keys-privkey').attr('type', 'password')
-						$(this).text('Show')
+						$(this).text(getText('show'))
 					}
 				})
 
@@ -1263,8 +1463,8 @@
 				$('#add-output').click(function(e){
 					$('#send-outputs').append(`
 						<div class="send-additional-output send-outputs-item input-group mb-2">
-							<input name="send-address" class="form-control" placeholder="Enter address" type="text">
-							<input name="send-ammount" class="form-control" placeholder="Amount" type="text">
+							<input name="send-address" class="form-control" placeholder="${getText('enter-address')}" type="text">
+							<input name="send-ammount" class="form-control" placeholder="${getText('amount')}" type="text">
 							<div class="input-group-append">
 								<button class="btn btn-danger remove-additional-output" type="submit">
 									<span class="entypo minus"></span>
@@ -1302,7 +1502,14 @@
 
 				// Change wallet backend
 				$('#wallet-backend button').click(function(e) {
+					console.log("WTH")
 					switchBackend($('#wallet-backend input').val())
+				})
+
+				// Change wallet language
+				$('#wallet-language-select select').on('change', function() {
+					setCookie('language', $('#wallet-language-select select').val(), 60)
+					initLang()
 				})
 
 				// Set wallet recomended fee
