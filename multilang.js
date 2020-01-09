@@ -1,6 +1,7 @@
 var walletLanguages = {
 	'en': {
 		'lang-alias': 'English',
+		'wallet-title': 'Walelt',
 		'open-regular': 'Regular wallet',
 		'open-key': 'Open by key',
 		'disclaimer': 'This page uses javascript to generate your addresses and sign your transactions within your browser, this means we never receive your private keys, this can be independently verified by reviewing the source code on Github.',
@@ -75,6 +76,7 @@ var walletLanguages = {
 	},
 	'uk': {
 		'lang-alias': 'Українська',
+		'wallet-title': 'Гаманець',
 		'open-regular': 'Звичайний гаманець',
 		'open-key': 'Відкрити ключем',
 		'disclaimer': 'Ця сторінка використовує javascript для генерації ваших адрес та підпису транзакцій всередині браузера, це означає, що ми ніколи не отримуємо ваші приватні ключі, це можна перевірити незалежно, переглянувши вихідний код на Github.',
