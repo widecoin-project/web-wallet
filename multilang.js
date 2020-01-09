@@ -164,7 +164,7 @@ var walletLanguages = {
 		'email-address': 'Alamat Email',
 		'password': 'Kata Kunci',
 		'password-confirm': 'Konfirmasi Kata Kunci',
-		'generate-question': 'sudah punya dompet\belum punya dompet?',
+		'generate-question': 'sudah punya dompet belum punya dompet?',
 		'generate-it': '<a href="#/create">Membuat</a> dompet!',
 		'wif-key': 'WIF Kunci Pribadi',
 		'create-wallet': 'Membuat Dompet',
