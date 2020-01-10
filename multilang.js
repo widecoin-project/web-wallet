@@ -374,12 +374,12 @@ var walletLanguages = {
 		'small-fee': '手续费金额不能低于'
 	},
 	'es': {
-		'lang-alias': 'español',
+		'lang-alias': 'Español',
 		'wallet-title': 'Cartera',
 		'open-regular': 'Cartera regular',
 		'open-key': 'Abrir con llave',
 		'disclaimer': 'Esta página utiliza Javascript para generar sus direcciones y firmar sus transacciones en su navegador, Esto implica que nunca recibimos sus claves privada, Esto puede ser verificado independientemente por medio de la revisión el código de fuente en Github.',
-		'open-reminder': '<b>Aviso:</b> Por favor asegúrese que se acuerda sus detalles de cuenta, podría perder el acceso de los fondos,
+		'open-reminder': '<b>Aviso:</b> Por favor asegúrese que se acuerda sus detalles de cuenta, podría perder el acceso de los fondos',
 		'open': 'Abrir',
 		'home': 'Página Inicial',
 		'create': 'Crear',
@@ -387,7 +387,7 @@ var walletLanguages = {
 		'settings': 'Configuraciones',
 		'email-address': 'Correo electrónico',
 		'password': 'Contraseña',
-		'password-confirm': 'confirma la contraseña',
+		'password-confirm': 'Confirma la contraseña',
 		'generate-question': 'todavia no tienes cartera?',
 		'generate-it': '<a href="#/crear">Generate</a> lo!',
 		'wif-key': 'WIF Clave privada',
@@ -447,5 +447,5 @@ var walletLanguages = {
 		'pass-too-short': 'Su contraseña debe tener al menos 10 caracteres!',
 		'bad-email': '¡Tu dirección de correo electrónico no parece ser válida!',
 		'small-fee': 'Debe especificar fee no menos de'
-	},
+	}
 }
