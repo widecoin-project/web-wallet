@@ -34,7 +34,7 @@ var walletLanguages = {
 		'wallet': 'Wallet',
 		'close': 'Close',
 		'send': 'Send',
-		'history': 'Hisotry',
+		'history': 'History',
 		'keys': 'Keys',
 		'reset': 'Reset',
 		'available-balance': 'Available balance:',
