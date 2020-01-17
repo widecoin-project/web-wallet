@@ -597,7 +597,7 @@ var walletLanguages = {
 		'pass-too-short': '비밀번호는 10글자 이상 입력해주세요.',
 		'bad-email': '올바른 메일 주소가 아닙니다.',
 		'small-fee': '최소수수료'
-	}
+	},
 	'de': {
 		'lang-alias': 'Deutsch',
 		'wallet-title': 'Wallet',
