@@ -76,7 +76,8 @@ var walletLanguages = {
 		'scan-qr': 'Scan',
 		'scan-modal-title': 'QR Code scanner',
 		'webcam-message': 'Please make sure you have a webcam enabled',
-		'webcam-loading': 'Loading camera...'
+		'webcam-loading': 'Loading camera...',
+		'outputs-added': 'added to outputs'
 	},
 	'uk': {
 		'lang-alias': 'Українська',
@@ -155,7 +156,8 @@ var walletLanguages = {
 		'scan-qr': 'Сканувати',
 		'scan-modal-title': 'Зчитувач QR коду',
 		'webcam-message': 'Будь ласка, переконайтеся, що у вас увімкнена веб-камера',
-		'webcam-loading': 'Завантаження камери...'
+		'webcam-loading': 'Завантаження камери...',
+		'outputs-added': 'додано до виходів'
 	},
 	'id': {
 		'lang-alias': 'Indonesian',

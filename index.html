@@ -567,6 +567,11 @@
 						'processing': getText('send-processing'),
 						'success': getText('success'),
 						'failed': getText('failed')
+					},
+					'misc': {
+						'outputAdded': function (address) {
+							return getText('address') + ' ' + '<b class="break-word">' + address + '</b>' + ' ' + getText('outputs-added')
+						}
 					}
 				}
 			}
@@ -1014,7 +1019,7 @@
 								}
 
 								$('#send-outputs input[name="send-address"]').last().val(address)
-								showMessage('Address <b class="break-word">' + address + '</b> added to outputs')
+								showMessage(messages.misc.outputAdded(address))
 								stop = true
 							}
 						}
