@@ -680,5 +680,5 @@ var walletLanguages = {
 		'pass-too-short': 'Die Länge Deines Passworts muss mindestens 10 Zeichen betragen!',
 		'bad-email': 'Deine Email-Adresse scheint nicht gültig zu sein!',
 		'small-fee': 'sollte nicht weniger betragen als'
-	},
+	}
 }
