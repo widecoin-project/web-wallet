@@ -17,6 +17,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/cozmo/jsQR@master/dist/jsQR.js"></script>
 		<script src="multilang.js"></script>
 
 		<script>
@@ -92,6 +93,13 @@
 			}
 			.balance-small {
 				font-size: 15px;
+			}
+			.send-balance-fix {
+				padding: 0px 0px 8px 0px;
+				display: inline-block;
+			}
+			.break-word {
+				word-wrap: break-word;
 			}
 		</style>
 		<title>Wallet</title>
@@ -215,23 +223,33 @@
 							</div>
 
 							<div id="wallet-send" class="tab-item d-none" data-tab="wallet-send">
-								<p>
-									<span>
+								<div class="mb-2">
+									<span class="">
 										<span tkey="available-balance"></span>
 										<b class="wallet-balance balance-small c-pointer">
 											<span class="amount"></span>
 											<span class="ticker" tkey="loading"></span>
 										</b>
 									</span>
-									<a href="#" id="send-reset" style="float: right;" tkey="reset"></a>
-								</p>
+
+									<div class="float-md-right">
+										<a href="#" id="send-qr" class="text-dark pr-1">
+											<span tkey="scan-qr"></span>
+											<span class="entypo camera"></span>
+										</a>
+										<a href="#" id="send-reset" class="text-dark">
+											<span tkey="reset"></span>
+											<span class="entypo cycle"></span>
+										</a>
+									</div>
+								</div>
 								
 								<div id="send-outputs">
 									<div class="input-group send-outputs-item mb-2">
 										<input name="send-address" class="form-control" type="text" value="" tkey="enter-address">
 										<input name="send-ammount" class="form-control" type="text" value="" tkey="amount">
 										<div class="input-group-append">
-											<button id="add-output" class="btn btn-success">
+											<button id="add-output" class="btn btn-outline-dark">
 												<span class="entypo plus"></span>
 											</button>
 										</div>
@@ -412,6 +430,25 @@
 			</div>
 		</div>
 
+		<div id="scan-modal" class="modal" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-md" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" tkey="scan-modal-title"></h5>
+						<button id="scan-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div id="loading-message">
+							
+						</div>
+						<canvas id="scan-canvas" hidden class="w-100"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="disclaimer mb-3">
 			<div class="container text-center">
 				<small class="text-muted" style="max-width: 1100px;" tkey="disclaimer"></small>
@@ -428,6 +465,7 @@
 		<!-- All magic is here :D -->
 		<script>
 			// Config
+			var stream = undefined
 			var walletTimer = false
 			var walletVersion = '0.4'
 			var networkConfigs = {
@@ -489,43 +527,47 @@
 			}
 
 			// Messages
-			var messages = {
-				'settings': {
-					'typeSwitched': function (type) {
-						return getText('address-type-changed') + ' <b>' + type + '</b>'
+			var messages = initMessages()
+
+			function initMessages() {
+				return {
+					'settings': {
+						'typeSwitched': function (type) {
+							return getText('address-type-changed') + ' <b>' + type + '</b>'
+						},
+						'backendSwitched': function (url) {
+							returngetText('backend-switched') +  ' <b>' + url + '</b>'
+						},
+						'backendNotWorking': function (url) {
+							return '<b>' + url + '</b> ' + getText('backend-down')
+						}
 					},
-					'backendSwitched': function (url) {
-						returngetText('backend-switched') +  ' <b>' + url + '</b>'
+					'error': {
+						'bad-utxo': getText('bad-utxo'),
+						'balance-load-failed': getText('balance-load-failed'),
+						'not-enough-funds': getText('not-enough-funds'),
+						'not-valid-address': getText('not-valid-address'),
+						'not-valid-amount': getText('not-valid-amount'),
+						'not-valid-fee': getText('not-valid-fee'),
+						'bad-priv-key': getText('bad-priv-key'),
+						'not-enough-utxo': getText('not-enough-utxo'),
+						'broadcast-failed': getText('broadcast-failed'),
+						'pass-not-match': getText('pass-not-match'),
+						'pass-too-short': getText('pass-too-short'),
+						'bad-email': getText('bad-email'),
+						'small-fee': getText('small-fee') + ' ' + getConfig()['fee'] + ' ' + getConfig()['ticker'] + '!'
 					},
-					'backendNotWorking': function (url) {
-						return '<b>' + url + '</b> ' + getText('backend-down')
+					'tx': {
+						'loading-utxo': getText('loading-utxo'),
+						'generating': getText('transaction-creation'),
+						'success': getText('transaction-broadcasted'),
+					},
+					'title': {
+						'sure': getText('send-sure'),
+						'processing': getText('send-processing'),
+						'success': getText('success'),
+						'failed': getText('failed')
 					}
-				},
-				'error': {
-					'bad-utxo': getText('bad-utxo'),
-					'balance-load-failed': getText('balance-load-failed'),
-					'not-enough-funds': getText('not-enough-funds'),
-					'not-valid-address': getText('not-valid-address'),
-					'not-valid-amount': getText('not-valid-amount'),
-					'not-valid-fee': getText('not-valid-fee'),
-					'bad-priv-key': getText('bad-priv-key'),
-					'not-enough-utxo': getText('not-enough-utxo'),
-					'broadcast-failed': getText('broadcast-failed'),
-					'pass-not-match': getText('pass-not-match'),
-					'pass-too-short': getText('pass-too-short'),
-					'bad-email': getText('bad-email'),
-					'small-fee': getText('small-fee') + ' ' + getConfig()['fee'] + ' ' + getConfig()['ticker'] + '!'
-				},
-				'tx': {
-					'loading-utxo': getText('loading-utxo'),
-					'generating': getText('transaction-creation'),
-					'success': getText('transaction-broadcasted'),
-				},
-				'title': {
-					'sure': getText('send-sure'),
-					'processing': getText('send-processing'),
-					'success': getText('success'),
-					'failed': getText('failed')
 				}
 			}
 
@@ -560,6 +602,7 @@
 					}
 				})
 
+				messages = initMessages()
 				setTitle(getText('wallet-settings'))
 				return language
 			}
@@ -918,6 +961,80 @@
 				globalData.tx.fee = amountFormat(($('#send-fee').val() != '') ? $('#send-fee').val() : globalData.rfee, true)
 			}
 
+			function stopStream() {
+				if (stream != undefined) {
+					stream.getTracks().forEach(function(track) {
+						track.stop()
+					})
+				}
+			}
+
+			function startStream() {
+				var canvasElement = document.getElementById('scan-canvas')
+				var canvas = canvasElement.getContext('2d')
+				var video = document.createElement('video')
+				canvasElement.hidden = true
+
+				$('#loading-message').text(getText('webcam-message'))
+				$('#loading-message').removeClass('d-none')
+
+				// Use facingMode: environment to attemt to get the front camera on phones
+				navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(gstream) {
+					stream = gstream
+					video.srcObject = stream
+					video.setAttribute("playsinline", true)
+					video.play()
+					requestAnimationFrame(tick)
+				})
+
+				function tick() {
+					$('#loading-message').text(getText('webcam-loading'))
+					var stop = false
+					if (video.readyState === video.HAVE_ENOUGH_DATA) {
+						$('#loading-message').addClass('d-none')
+						canvasElement.hidden = false
+
+						canvasElement.height = video.videoHeight
+						canvasElement.width = video.videoWidth
+						canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height)
+						var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height)
+						var code = jsQR(imageData.data, imageData.width, imageData.height, {
+							inversionAttempts: "dontInvert",
+						})
+						
+						if (code) {
+							var address = code.data
+							if (address.startsWith(getConfig()['uri'])) {
+								address = address.replace(getConfig()['uri'], '')
+							}
+
+							if (validateAddress(address)) {
+								if ($('#send-outputs input[name="send-address"]').last().val() != '') {
+									$('#add-output').click()
+								}
+
+								$('#send-outputs input[name="send-address"]').last().val(address)
+								showMessage('Address <b class="break-word">' + address + '</b> added to outputs')
+								stop = true
+							}
+						}
+					}
+
+					if (!stop) {
+						requestAnimationFrame(tick)
+					} else {
+						$('#scan-modal').modal('toggle')
+						stopStream()
+					}
+				}
+			}
+
+			function showScanModal() {
+				// $('#scan-canvas').addClass('d-none')
+				$('#scan-modal').modal('toggle')
+				startStream()
+			}
+
 			function sendTransaction() {
 				var network = getConfig()['network']
 				var keys = globalData.keys
@@ -1151,6 +1268,13 @@
 				globalData.resetTx()
 			}
 
+			function initWallet() {
+				// Open only if key is valid
+				if (globalData.keys != undefined) {
+					openWallet(globalData.keys)
+				}
+			}
+
 			// All starts here
 			$(document).ready(function() {
 				initLang()
@@ -1235,11 +1359,8 @@
 							showMessage(messages.error['bad-priv-key'])
 						}
 
-						if (globalData.keys != undefined) {
-							// Open only if key is valid
-							$('#passphrase').val('')
-							openWallet(globalData.keys)
-						}
+						$('#passphrase').val('')
+						initWallet()
 					} else {
 						showMessage(messages.error['bad-priv-key'])
 					}
@@ -1321,7 +1442,7 @@
 							<input name="send-address" class="form-control" placeholder="${getText('enter-address')}" type="text">
 							<input name="send-ammount" class="form-control" placeholder="${getText('amount')}" type="text">
 							<div class="input-group-append">
-								<button class="btn btn-danger remove-additional-output" type="submit">
+								<button class="btn btn-outline-danger remove-additional-output" type="submit">
 									<span class="entypo minus"></span>
 								</button>
 							</div>
@@ -1340,6 +1461,12 @@
 					e.preventDefault()
 				})
 
+				// Reset send form
+				$('#send-qr').click(function(e) {
+					showScanModal()
+					e.preventDefault()
+				})
+
 				// Footer button which close wallet
 				$('#footer-close').click(function(e) {
 					closeWallet()
@@ -1350,9 +1477,7 @@
 				$('#address-type-select select').on('change', function() {
 					switchAddressType($(this).val())
 					showMessage(messages.settings.typeSwitched($(this).val()))
-					if (globalData.keys != undefined) {
-						openWallet(globalData.keys)
-					}
+					initWallet()
 				})
 
 				// Change wallet backend
@@ -1364,6 +1489,7 @@
 				$('#wallet-language-select select').on('change', function() {
 					setCookie('language', $('#wallet-language-select select').val(), 60)
 					initLang()
+					initWallet()
 				})
 
 				// Set wallet recomended fee
@@ -1374,7 +1500,12 @@
 						globalData.rfee = getConfig()['fee']
 					}
 				})
+
+				$('#scan-modal').on('hide.bs.modal', function (e) {
+					stopStream()
+				})
 			})
 		</script>
+
 	</body>
 </html>

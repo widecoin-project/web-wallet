@@ -72,7 +72,11 @@ var walletLanguages = {
 		'pass-not-match': 'Your passwords do not match!',
 		'pass-too-short': 'Your password must be at least 10 chars long!',
 		'bad-email': 'Your email address doesn\'t appear to be valid!',
-		'small-fee': 'You should specify fee not less than'
+		'small-fee': 'You should specify fee not less than',
+		'scan-qr': 'Scan',
+		'scan-modal-title': 'QR Code scanner',
+		'webcam-message': 'Please make sure you have a webcam enabled',
+		'webcam-loading': 'Loading camera...'
 	},
 	'uk': {
 		'lang-alias': 'Українська',
@@ -147,7 +151,11 @@ var walletLanguages = {
 		'pass-not-match': 'Паролі не не збігаються!',
 		'pass-too-short': 'Ваш пароль повинен бути не менше 10 символів!',
 		'bad-email': 'Схоже, що ви ввели не дійсну поштову скриньку!',
-		'small-fee': 'Ви маєте задати комісію не менше ніж'
+		'small-fee': 'Ви маєте задати комісію не менше ніж',
+		'scan-qr': 'Сканувати',
+		'scan-modal-title': 'Зчитувач QR коду',
+		'webcam-message': 'Будь ласка, переконайтеся, що у вас увімкнена веб-камера',
+		'webcam-loading': 'Завантаження камери...'
 	},
 	'id': {
 		'lang-alias': 'Indonesian',
