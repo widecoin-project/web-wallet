@@ -488,6 +488,26 @@
 						'scriptHash': 0x7D,
 						'wif': 0x80
 					}
+				},
+				'TUGAR': {
+					'uri': 'sugarchain:',
+					'title': 'Sugar Wallet',
+					'name': 'Test Network (TUGAR)',
+					'api': 'https://api-testnet.sugarchain.org',
+					'ticker': 'TUGAR',
+					'decimals': 8,
+					'fee': 0.00001,
+					'network': {
+						'messagePrefix': '\x19Sugarchain Signed Message:\n',
+						'bip32': {
+							'public': 0x0488b21e,
+							'private': 0x0488ade4
+						},
+						'bech32': 'tugar',
+						'pubKeyHash': 0x42,
+						'scriptHash': 0x80,
+						'wif': 0xEF
+					}
 				}
 			}
 
@@ -644,6 +664,7 @@
 					setCookie('network', network, 60)
 					closeWallet()
 					displayNetworks()
+					switchBackend(networkConfigs[network]['api'])
 				}
 
 				switchPage(page)
