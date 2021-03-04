@@ -1,5 +1,5 @@
 #  Web Wallet
-Nice and simple web wallet with robust [ApiServer](https://github.com/MicroBitcoinOrg/ElectrumX/) backend :3
+Nice and simple web wallet with robust [ApiServer](https://github.com/sugarchain-project/api-server) backend :3
 
 Feel free to modify/use it in your projects :D
 
