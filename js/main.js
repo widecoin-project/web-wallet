@@ -22,12 +22,12 @@ var networkConfigs = {
             'scriptHash': 0x51,
             'wif': 0x99
         }
-    },
-    'TWCN': {
+    }//,
+    /*'TWCN': {
         'uri': 'widecoin:',
         'title': 'Widecoin Wallet',
         'name': 'Test Network (TWCN)',
-        'api': 'https://api-testnet.sugarchain.org',
+        'api': 'http://api-test.widecoin.org',
         'ticker': 'TWCN',
         'decimals': 8,
         'fee': 0.00001,
@@ -42,16 +42,16 @@ var networkConfigs = {
             'scriptHash': 0x80,
             'wif': 0xEF
         }
-    }
+    }*/
 }
 
 // Explorer links
 var blockExplorer = {
     'address': function(address) {
-        return 'https://sugar.wtf/#/address/' + address + '/' + getConfig()['ticker']
+        return 'https://explorer.widecoin.org/address/' + address + '/' + getConfig()['ticker']
     },
     'tx': function(tx) {
-        return 'https://sugar.wtf/#/transaction/' + tx + '/' + getConfig()['ticker']
+        return 'https://explorer.widecoin.org/tx/' + tx + '/' + getConfig()['ticker']
     }
 }
 
