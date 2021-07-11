@@ -48,10 +48,12 @@ var networkConfigs = {
 // Explorer links
 var blockExplorer = {
     'address': function(address) {
-        return 'https://explorer.widecoin.org/address/' + address + '/' + getConfig()['ticker']
+        //return 'https://explorer.widecoin.org/address/' + address + '/' + getConfig()['ticker']
+        return 'https://explorer.widecoin.org/address/' + address
     },
     'tx': function(tx) {
-        return 'https://explorer.widecoin.org/tx/' + tx + '/' + getConfig()['ticker']
+        //return 'https://explorer.widecoin.org/tx/' + tx + '/' + getConfig()['ticker']
+        return 'https://explorer.widecoin.org/tx/' + tx 
     }
 }
 
