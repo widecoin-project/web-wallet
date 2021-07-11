@@ -1,4 +1,4 @@
-            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+            DO WHAT THE NEW THINGS YOU WANT TO PUBLIC LICENSE
                     Version 2, December 2004
 
  Copyright (C) 2019 Volodymyr Biloshytskyi <volbil@protonmail.com>
