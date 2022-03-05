@@ -7,7 +7,7 @@ var networkConfigs = {
         'uri': 'widecoin:',
         'title': 'Widecoin Wallet',
         'name': 'Main Network (WCN)',
-        'api': 'http://api.widecoin.org',
+        'api': 'https://api.widecoin.org',
         'ticker': 'WCN',
         'decimals': 8,
         'fee': 0.00001,
